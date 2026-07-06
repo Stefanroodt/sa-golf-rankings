@@ -103,6 +103,7 @@ export default function CoursePage() {
           <div className="meta">
             {course.town}, {course.province}
             {course.designer ? ` · Designed by ${course.designer}` : ''} · {course.access}
+            {course.holes ? ` · ${course.holes} holes` : ''}
           </div>
         </div>
       </section>
@@ -111,7 +112,10 @@ export default function CoursePage() {
         <div>
           <div className="card">
             <h2>About</h2>
-            <p style={{ fontSize: 14 }}>{course.description}</p>
+            <p style={{ fontSize: 14 }}>
+              {course.description ||
+                'No description yet — know this course? Add a rating and tell fellow golfers about it in your comment.'}
+            </p>
           </div>
 
           <div className="card">

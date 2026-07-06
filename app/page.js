@@ -17,6 +17,7 @@ function Stars({ value }) {
 export default function Home() {
   const [courses, setCourses] = useState(null);
   const [province, setProvince] = useState('All provinces');
+  const [holes, setHoles] = useState('All courses');
   const [query, setQuery] = useState('');
   const [error, setError] = useState(null);
 
@@ -47,7 +48,10 @@ export default function Home() {
   const visible = ranked.filter(
     (c) =>
       (province === 'All provinces' || c.province === province) &&
-      c.name.toLowerCase().includes(query.toLowerCase())
+      (holes === 'All courses' ||
+        (holes === '18-hole' ? (c.holes ?? 18) >= 18 : (c.holes ?? 18) < 18)) &&
+      (c.name.toLowerCase().includes(query.toLowerCase()) ||
+        c.town.toLowerCase().includes(query.toLowerCase()))
   );
 
   return (
@@ -70,8 +74,13 @@ export default function Home() {
               <option key={p}>{p}</option>
             ))}
           </select>
+          <select value={holes} onChange={(e) => setHoles(e.target.value)}>
+            {['All courses', '18-hole', '9-hole'].map((h) => (
+              <option key={h}>{h}</option>
+            ))}
+          </select>
           <input
-            placeholder="Search courses…"
+            placeholder="Search course or town…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -89,6 +98,7 @@ export default function Home() {
                   <h3>
                     {c.name}
                     <span className="badge">{c.access}</span>
+                    {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
                   </h3>
                   <div className="meta">
                     {c.town}, {c.province}
