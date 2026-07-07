@@ -70,7 +70,6 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
               <div className="rank-info">
                 <h3>
                   {c.name}
-                  <span className="badge">{c.access}</span>
                   {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
                 </h3>
                 <div className="meta">
