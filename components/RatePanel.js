@@ -53,22 +53,32 @@ export default function RatePanel({ course }) {
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from('ratings').upsert(
-      {
-        course_id: course.id,
-        user_id: user.id,
-        display_name: user.user_metadata?.display_name || user.email.split('@')[0],
-        ...form,
-        comment: comment.trim() || null,
-      },
-      { onConflict: 'course_id,user_id' }
-    );
-    setSaving(false);
-    if (error) setStatus({ type: 'error', msg: error.message });
-    else {
-      setStatus({ type: 'success', msg: 'Your rating is in. Thanks for shaping the list!' });
-      router.refresh();
+    const { data: { session } } = await supabase.auth.getSession();
+    let result;
+    try {
+      const res = await fetch('/api/rate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token || ''}`,
+        },
+        body: JSON.stringify({ course_id: course.id, ...form, comment }),
+      });
+      result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Something went wrong.');
+    } catch (e) {
+      setSaving(false);
+      setStatus({ type: 'error', msg: e.message });
+      return;
     }
+    setSaving(false);
+    setStatus({
+      type: 'success',
+      msg: result.suspect
+        ? 'Thanks — your rating was recorded and is pending review.'
+        : 'Your rating is in. Thanks for shaping the list!',
+    });
+    router.refresh();
   }
 
   return (

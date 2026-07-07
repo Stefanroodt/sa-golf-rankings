@@ -72,6 +72,31 @@ export default function AuthPage() {
           <button className="btn" disabled={busy} style={{ width: '100%', marginTop: 4 }}>
             {busy ? 'Working…' : mode === 'signup' ? 'Create account' : 'Sign in'}
           </button>
+          <button
+            type="button"
+            className="btn btn-gold"
+            disabled={busy}
+            style={{ width: '100%', marginTop: 8 }}
+            onClick={async () => {
+              if (!email) return setStatus({ type: 'error', msg: 'Enter your email first.' });
+              setBusy(true);
+              const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                  emailRedirectTo: window.location.origin,
+                  data: { display_name: name.trim() || email.split('@')[0] },
+                },
+              });
+              setBusy(false);
+              setStatus(
+                error
+                  ? { type: 'error', msg: error.message }
+                  : { type: 'success', msg: 'Check your email — the sign-in link logs you straight in, no password needed.' }
+              );
+            }}
+          >
+            Or email me a sign-in link
+          </button>
           {status && <p className={status.type}>{status.msg}</p>}
         </form>
       </div>
