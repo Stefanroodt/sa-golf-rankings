@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import RankingsExplorer from '../components/RankingsExplorer';
 import PlayedProgress from '../components/PlayedProgress';
+import FeedbackButton from '../components/FeedbackForm';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
 export const revalidate = 60;
@@ -21,6 +22,7 @@ export default async function Home() {
             course — and you&apos;ve got opinions of your own. Which are your
             favourites? Rate them and have your say.
           </p>
+          <FeedbackButton />
         </div>
       </section>
 

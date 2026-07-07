@@ -41,11 +41,17 @@ a { color: inherit; text-decoration: none; }
   padding: 3px 10px; border-radius: 20px; white-space: nowrap;
 }
 .played-pill:hover { background: rgba(247,243,233,.2); color: var(--gold); }
-.nav-feedback {
-  background: none; border: 1px solid rgba(247,243,233,.3); color: var(--cream);
-  font-size: 13px; padding: 4px 12px; border-radius: 20px; cursor: pointer;
+.hero { position: relative; }
+.hero-feedback {
+  position: absolute; right: 48px; top: 50%; transform: translateY(-50%);
+  background: var(--gold); color: var(--green-deep); border: none;
+  font-size: 15px; font-weight: 700; padding: 13px 26px; border-radius: 28px;
+  cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.25);
 }
-.nav-feedback:hover { border-color: var(--gold); color: var(--gold); }
+.hero-feedback:hover { background: #d9b23a; }
+@media (max-width: 900px) {
+  .hero-feedback { position: static; transform: none; margin-top: 18px; }
+}
 
 /* Modal */
 .modal-overlay {
