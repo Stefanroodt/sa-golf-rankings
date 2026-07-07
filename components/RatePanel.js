@@ -16,7 +16,7 @@ function StarInput({ value, onChange }) {
   );
 }
 
-const empty = { overall: 0, value: 0, conditions: 0, layout: 0, pace: 0, staff: 0 };
+const empty = { overall: 0, value: 0, conditions: 0, layout: 0, clubhouse: 0, staff: 0 };
 
 export default function RatePanel({ course }) {
   const router = useRouter();
@@ -37,7 +37,7 @@ export default function RatePanel({ course }) {
         if (mine) {
           setForm({
             overall: mine.overall, value: mine.value, conditions: mine.conditions,
-            layout: mine.layout, pace: mine.pace, staff: mine.staff,
+            layout: mine.layout, clubhouse: mine.clubhouse, staff: mine.staff,
           });
           setComment(mine.comment || '');
         }

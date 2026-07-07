@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
     title: `${course.name} — golfer reviews & ratings | FairwayRank ZA`,
     description:
       course.description ||
-      `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, conditions, layout, pace and staff.`,
+      `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, conditions, layout, clubhouse and staff.`,
   };
 }
 
