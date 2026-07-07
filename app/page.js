@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import RankingsExplorer from '../components/RankingsExplorer';
 import PlayedProgress from '../components/PlayedProgress';
+import FeedbackForm from '../components/FeedbackForm';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
 export const revalidate = 60;
@@ -68,6 +69,8 @@ export default async function Home() {
             )}
           </div>
         )}
+
+        <FeedbackForm />
       </div>
     </>
   );
