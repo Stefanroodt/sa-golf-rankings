@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 const PAGE = 20;
 
@@ -16,6 +17,17 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
   const [sort, setSort] = useState('Ranking');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
+  const [played, setPlayed] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const { data } = await supabase
+        .from('ratings').select('course_id').eq('user_id', u.user.id);
+      if (data) setPlayed(new Set(data.map((r) => r.course_id)));
+    })();
+  }, []);
 
   const sorters = {
     'Ranking': (a, b) => b.score - a.score || b.n_ratings - a.n_ratings || a.name.localeCompare(b.name),
@@ -81,6 +93,7 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
                 <h3>
                   {c.name}
                   {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
+                  {played?.has(c.id) && <span className="badge badge-played">✓ Played</span>}
                 </h3>
                 <div className="meta">
                   {c.town}, {c.province}
@@ -105,6 +118,12 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
         ))}
       </ol>
 
+      {played && (
+        <p className="notice" style={{ textAlign: 'center', marginTop: -8, marginBottom: 24 }}>
+          You&apos;ve played &amp; rated {played.size} of {courses.length} courses
+          {visible.some((c) => !played.has(c.id)) ? ' — spot one you know above?' : ''}
+        </p>
+      )}
       {visible.length > PAGE && (
         <div className="pager">
           <button

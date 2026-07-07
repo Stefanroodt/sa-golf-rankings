@@ -50,6 +50,14 @@ export default function ProfilePage() {
             {ratings.length} course{ratings.length === 1 ? '' : 's'} played &amp; rated
             {total ? ` of ${total}` : ''}
           </div>
+          {total > 0 && (
+            <div className="progress-track">
+              <div
+                className="progress-fill"
+                style={{ width: `${Math.min(100, (ratings.length / total) * 100)}%` }}
+              />
+            </div>
+          )}
         </div>
       </section>
       <div className="container" style={{ margin: '28px auto 60px' }}>
