@@ -25,9 +25,9 @@ export default function Nav() {
           <Link href="/">Rankings</Link>
           {user ? (
             <>
-              <span style={{ opacity: 0.8 }}>
+              <Link href="/profile" style={{ opacity: 0.9 }}>
                 {user.user_metadata?.display_name || user.email}
-              </span>
+              </Link>
               <a
                 href="#"
                 onClick={async (e) => {
