@@ -74,6 +74,25 @@ export default function AuthPage() {
           </button>
           <button
             type="button"
+            className="btn"
+            disabled={busy}
+            style={{ width: '100%', marginTop: 8, background: '#fff', color: 'var(--ink)', border: '1px solid var(--cream-dark)' }}
+            onClick={async () => {
+              setBusy(true);
+              const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin },
+              });
+              if (error) {
+                setBusy(false);
+                setStatus({ type: 'error', msg: error.message });
+              }
+            }}
+          >
+            Continue with Google
+          </button>
+          <button
+            type="button"
             className="btn btn-gold"
             disabled={busy}
             style={{ width: '100%', marginTop: 8 }}

@@ -45,7 +45,10 @@ export default function PhotoUpload({ courseId }) {
       const { error: rowErr } = await supabase.from('photos').insert({
         course_id: courseId,
         user_id: user.id,
-        display_name: user.user_metadata?.display_name || user.email.split('@')[0],
+        display_name:
+          user.user_metadata?.display_name ||
+          user.user_metadata?.full_name ||
+          user.email.split('@')[0],
         path,
       });
       if (rowErr) throw rowErr;

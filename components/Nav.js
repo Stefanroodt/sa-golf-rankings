@@ -34,7 +34,7 @@ export default function Nav() {
           {user ? (
             <>
               <Link href="/profile" style={{ opacity: 0.9 }}>
-                {user.user_metadata?.display_name || user.email}
+                {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email}
               </Link>
               <a
                 href="#"

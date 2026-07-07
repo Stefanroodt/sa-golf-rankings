@@ -60,7 +60,10 @@ export async function POST(req) {
     {
       course_id,
       user_id: user.id,
-      display_name: user.user_metadata?.display_name || user.email.split('@')[0],
+      display_name:
+        user.user_metadata?.display_name ||
+        user.user_metadata?.full_name ||
+        user.email.split('@')[0],
       ...scores,
       comment: (comment || '').trim() || null,
       ip_hash,
