@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 
 export default function Nav() {
   const [user, setUser] = useState(null);
+  const [played, setPlayed] = useState(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -14,6 +15,17 @@ export default function Nav() {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user) { setPlayed(null); return; }
+    (async () => {
+      const [{ count: mine }, { count: total }] = await Promise.all([
+        supabase.from('ratings').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('courses').select('id', { count: 'exact', head: true }),
+      ]);
+      if (mine !== null && total !== null) setPlayed({ mine, total });
+    })();
+  }, [user]);
 
   return (
     <nav className="nav">
@@ -33,6 +45,11 @@ export default function Nav() {
           <Link href="/">Rankings</Link>
           {user ? (
             <>
+              {played && (
+                <Link href="/profile" className="played-pill" title="Courses you've played & rated">
+                  ⛳ {played.mine}/{played.total}
+                </Link>
+              )}
               <Link href="/profile" style={{ opacity: 0.9 }}>
                 {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email}
               </Link>
