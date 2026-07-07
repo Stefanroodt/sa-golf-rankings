@@ -13,11 +13,12 @@ export default async function Home() {
     <>
       <section className="hero">
         <div className="container">
-          <h1>South Africa&apos;s golf courses, ranked by golfers.</h1>
+          <h1>Golf courses, ranked by golfers.</h1>
           <p>
-            No panels, no politics — every position on this list is decided by
-            ratings from people who actually played the course. All {courses.length} GolfRSA-affiliated
-            courses are here. Played one? Add your rating.
+            Who decides which courses are the best? Around here, you do. Every
+            position on this list comes from golfers who&apos;ve actually played the
+            course — and you&apos;ve got opinions of your own. Which are your
+            favourites? Rate them and have your say.
           </p>
         </div>
       </section>
