@@ -24,7 +24,7 @@ export default function PlayedProgress() {
   return (
     <Link href="/profile" className="played-progress">
       <span className="played-progress-label">
-        {stats.mine} course{stats.mine === 1 ? '' : 's'} played &amp; rated of {stats.total}
+        {stats.mine}/{stats.total} courses rated and played
       </span>
       <span className="progress-track on-light">
         <span
