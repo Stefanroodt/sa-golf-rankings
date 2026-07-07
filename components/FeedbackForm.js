@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
-export default function FeedbackForm() {
+export default function FeedbackButton() {
+  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState(null);
@@ -25,38 +26,52 @@ export default function FeedbackForm() {
       setStatus({ type: 'success', msg: 'Thanks — feedback received!' });
       setMessage('');
       setEmail('');
+      setTimeout(() => { setOpen(false); setStatus(null); }, 1500);
     }
   }
 
   return (
-    <div className="card" style={{ margin: '0 0 48px' }}>
-      <h2>Help make Pin High better</h2>
-      <p className="notice" style={{ marginTop: 0 }}>
-        Spotted a wrong course detail? Missing a course? Have an idea? Tell us.
-      </p>
-      <form onSubmit={submit}>
-        <textarea
-          placeholder="Your feedback…"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          maxLength={2000}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email (optional, if you'd like a reply)"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: '100%', padding: '10px 12px', border: '1px solid var(--cream-dark)',
-            borderRadius: 8, fontSize: 14, marginTop: 8,
-          }}
-        />
-        <button className="btn" disabled={busy || !message.trim()}>
-          {busy ? 'Sending…' : 'Send feedback'}
-        </button>
-        {status && <p className={status.type}>{status.msg}</p>}
-      </form>
-    </div>
+    <>
+      <button className="nav-feedback" onClick={() => setOpen(true)}>
+        Feedback
+      </button>
+      {open && (
+        <div className="modal-overlay" onClick={() => setOpen(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setOpen(false)} aria-label="Close">
+              ×
+            </button>
+            <h2>Help make Pin High better</h2>
+            <p className="notice" style={{ marginTop: 4 }}>
+              Wrong course detail? Missing course? An idea? Tell us.
+            </p>
+            <form onSubmit={submit}>
+              <textarea
+                placeholder="Your feedback…"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                maxLength={2000}
+                autoFocus
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email (optional, if you'd like a reply)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{
+                  width: '100%', padding: '10px 12px', border: '1px solid var(--cream-dark)',
+                  borderRadius: 8, fontSize: 14, marginTop: 8,
+                }}
+              />
+              <button className="btn" disabled={busy || !message.trim()}>
+                {busy ? 'Sending…' : 'Send feedback'}
+              </button>
+              {status && <p className={status.type}>{status.msg}</p>}
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
