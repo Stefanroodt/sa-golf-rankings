@@ -25,6 +25,7 @@ export default function RatePanel({ course }) {
   const [comment, setComment] = useState('');
   const [status, setStatus] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [missing, setMissing] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -48,10 +49,16 @@ export default function RatePanel({ course }) {
   async function submit(e) {
     e.preventDefault();
     setStatus(null);
-    if (CATEGORIES.some(({ key }) => !form[key])) {
-      setStatus({ type: 'error', msg: 'Please rate every category (1–5 stars).' });
+    const unrated = CATEGORIES.filter(({ key }) => !form[key]).map(({ key }) => key);
+    if (unrated.length) {
+      setMissing(unrated);
+      setStatus({
+        type: 'error',
+        msg: `Almost there — the categories marked below still need stars.`,
+      });
       return;
     }
+    setMissing([]);
     setSaving(true);
     const { data: { session } } = await supabase.auth.getSession();
     let result;
@@ -101,13 +108,20 @@ export default function RatePanel({ course }) {
           )}
           {CATEGORIES.map(({ key, label, hint }) => (
             <div className="rate-row" key={key}>
-              <label>
+              <label style={missing.includes(key) ? { color: 'var(--danger)', fontWeight: 600 } : undefined}>
                 {label}
+                {missing.includes(key) && ' *'}
                 <span className="tip" tabIndex={0} aria-label={hint}>
                   ⓘ<span className="tip-box">{hint}</span>
                 </span>
               </label>
-              <StarInput value={form[key]} onChange={(v) => setForm((f) => ({ ...f, [key]: v }))} />
+              <StarInput
+                value={form[key]}
+                onChange={(v) => {
+                  setForm((f) => ({ ...f, [key]: v }));
+                  setMissing((m) => m.filter((k) => k !== key));
+                }}
+              />
             </div>
           ))}
           <textarea
