@@ -28,6 +28,16 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
     'A–Z': (a, b) => a.name.localeCompare(b.name),
   };
 
+  const metricMap = {
+    'Best value': 'avg_value',
+    'Best conditions': 'avg_conditions',
+    'Best layout': 'avg_layout',
+    'Best clubhouse': 'avg_clubhouse',
+    'Best staff': 'avg_staff',
+  };
+  const metricKey = metricMap[sort] || 'avg_overall';
+  const metricLabel = metricMap[sort] ? sort.replace('Best ', '') : 'overall';
+
   const visible = courses
     .filter(
       (c) =>
@@ -80,9 +90,11 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
               <div className="rank-score">
                 {c.n_ratings > 0 ? (
                   <>
-                    <div className="score-big">{Number(c.avg_overall).toFixed(1)}</div>
-                    <Stars value={Number(c.avg_overall)} />
-                    <div className="score-sub">{c.n_ratings} rating{c.n_ratings === 1 ? '' : 's'}</div>
+                    <div className="score-big">{Number(c[metricKey] ?? 0).toFixed(1)}</div>
+                    <Stars value={Number(c[metricKey] ?? 0)} />
+                    <div className="score-sub">
+                      {metricLabel} · {c.n_ratings} rating{c.n_ratings === 1 ? '' : 's'}
+                    </div>
                   </>
                 ) : (
                   <div className="unrated">No ratings yet — be first</div>
