@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import RatePanel from '../../../components/RatePanel';
 import ShareButtons from '../../../components/ShareButtons';
 import ReportButton from '../../../components/ReportButton';
-import { getCourse, getRatings } from '../../../lib/server';
+import PhotoUpload from '../../../components/PhotoUpload';
+import PhotoReportButton from '../../../components/PhotoReportButton';
+import { getCourse, getRatings, getPhotos, photoUrl } from '../../../lib/server';
 import { CATEGORIES } from '../../../lib/supabase';
 
 export const revalidate = 0; // always fresh
@@ -22,7 +24,10 @@ export async function generateMetadata({ params }) {
 export default async function CoursePage({ params }) {
   const course = await getCourse(params.slug);
   if (!course) notFound();
-  const ratings = await getRatings(course.id);
+  const [ratings, photos] = await Promise.all([
+    getRatings(course.id),
+    getPhotos(course.id),
+  ]);
 
   const avg = (key) =>
     ratings.length ? ratings.reduce((s, r) => s + r[key], 0) / ratings.length : 0;
@@ -90,6 +95,23 @@ export default async function CoursePage({ params }) {
               ))}
           </div>
 
+          {photos.length > 0 && (
+            <div className="card">
+              <h2>Photos</h2>
+              <div className="photo-grid">
+                {photos.map((p) => (
+                  <figure key={p.id}>
+                    <img src={photoUrl(p.path)} alt={`${course.name} — photo by ${p.display_name}`} loading="lazy" />
+                    <figcaption>
+                      {p.display_name}
+                      <PhotoReportButton photoId={p.id} />
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          )}
+
           {ratings.some((r) => r.comment) && (
             <div className="card">
               <h2>What golfers say</h2>
@@ -112,6 +134,7 @@ export default async function CoursePage({ params }) {
 
         <div>
           <RatePanel course={course} />
+          <PhotoUpload courseId={course.id} />
           <div className="card">
             <h2>Share this course</h2>
             <ShareButtons name={course.name} slug={course.slug} />
