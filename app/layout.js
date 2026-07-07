@@ -6,6 +6,14 @@ export const metadata = {
   title: 'Pin High — South Africa\'s golf courses, ranked by golfers',
   description:
     'South African golf course rankings powered entirely by ratings from everyday golfers. Rate the courses you\'ve played and shape the list.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    siteName: 'Pin High',
+    type: 'website',
+    locale: 'en_ZA',
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'Pin High — golf courses, ranked by golfers' }],
+  },
+  twitter: { card: 'summary_large_image' },
 };
 
 export default function RootLayout({ children }) {

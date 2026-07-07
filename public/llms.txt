@@ -1,0 +1,26 @@
+# Pin High
+
+> Pin High (pinhigh.co.za) ranks all 413 GolfRSA-affiliated golf courses in
+> South Africa using ratings from everyday golfers — not expert panels.
+> Golfers rate courses they have played on six criteria: overall, value,
+> conditions, layout, clubhouse and staff. Rankings update live as ratings
+> come in, weighted so courses with more ratings rank more reliably.
+
+## Rankings
+
+- [National rankings](https://pinhigh.co.za/): all South African courses ranked by golfer ratings
+- [Western Cape](https://pinhigh.co.za/province/western-cape)
+- [Eastern Cape](https://pinhigh.co.za/province/eastern-cape)
+- [KwaZulu-Natal](https://pinhigh.co.za/province/kwazulu-natal)
+- [Gauteng](https://pinhigh.co.za/province/gauteng)
+- [Mpumalanga](https://pinhigh.co.za/province/mpumalanga)
+- [Limpopo](https://pinhigh.co.za/province/limpopo)
+- [North West](https://pinhigh.co.za/province/north-west)
+- [Free State](https://pinhigh.co.za/province/free-state)
+- [Northern Cape](https://pinhigh.co.za/province/northern-cape)
+
+## Course pages
+
+Each course has a page at https://pinhigh.co.za/course/{slug} with location,
+designer, golfer ratings per category, reviews and photos. The full list of
+courses is in the sitemap: https://pinhigh.co.za/sitemap.xml

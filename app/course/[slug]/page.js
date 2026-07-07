@@ -13,11 +13,18 @@ export const revalidate = 0; // always fresh
 export async function generateMetadata({ params }) {
   const course = await getCourse(params.slug);
   if (!course) return {};
+  const description =
+    course.description ||
+    `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, conditions, layout, clubhouse and staff.`;
   return {
     title: `${course.name} — golfer reviews & ratings | Pin High`,
-    description:
-      course.description ||
-      `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, conditions, layout, clubhouse and staff.`,
+    description,
+    alternates: { canonical: `/course/${params.slug}` },
+    openGraph: {
+      title: `${course.name} — golfer reviews & ratings`,
+      description,
+      url: `/course/${params.slug}`,
+    },
   };
 }
 
@@ -36,8 +43,35 @@ export default async function CoursePage({ params }) {
     `${course.name} ${course.town} South Africa`
   )}`;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'GolfCourse',
+    name: course.name,
+    description: course.description || undefined,
+    url: `https://pinhigh.co.za/course/${course.slug}`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: course.town,
+      addressRegion: course.province,
+      addressCountry: 'ZA',
+    },
+    ...(ratings.length > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: avg('overall').toFixed(2),
+        bestRating: '5',
+        worstRating: '1',
+        ratingCount: ratings.length,
+      },
+    }),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="course-head">
         <div className="container">
           <Link href="/" className="back-link">← Back to rankings</Link>
