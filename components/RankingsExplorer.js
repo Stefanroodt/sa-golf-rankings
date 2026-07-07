@@ -22,6 +22,9 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
     'Most rated': (a, b) => b.n_ratings - a.n_ratings || b.score - a.score,
     'Best value': (a, b) => (b.avg_value ?? 0) - (a.avg_value ?? 0) || b.n_ratings - a.n_ratings,
     'Best conditions': (a, b) => (b.avg_conditions ?? 0) - (a.avg_conditions ?? 0) || b.n_ratings - a.n_ratings,
+    'Best layout': (a, b) => (b.avg_layout ?? 0) - (a.avg_layout ?? 0) || b.n_ratings - a.n_ratings,
+    'Best clubhouse': (a, b) => (b.avg_clubhouse ?? 0) - (a.avg_clubhouse ?? 0) || b.n_ratings - a.n_ratings,
+    'Best staff': (a, b) => (b.avg_staff ?? 0) - (a.avg_staff ?? 0) || b.n_ratings - a.n_ratings,
     'A–Z': (a, b) => a.name.localeCompare(b.name),
   };
 
