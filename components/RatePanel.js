@@ -93,9 +93,20 @@ export default function RatePanel({ course }) {
         </>
       ) : (
         <form onSubmit={submit}>
-          {CATEGORIES.map(({ key, label }) => (
+          {!CATEGORIES.some(({ key }) => form[key]) && (
+            <p className="notice" style={{ marginTop: 0, marginBottom: 12 }}>
+              First rating? Tap the stars for each category — 1 star is poor, 5 is
+              world class. Hover the ⓘ if you&apos;re unsure what something means.
+            </p>
+          )}
+          {CATEGORIES.map(({ key, label, hint }) => (
             <div className="rate-row" key={key}>
-              <label>{label}</label>
+              <label>
+                {label}
+                <span className="tip" tabIndex={0} aria-label={hint}>
+                  ⓘ<span className="tip-box">{hint}</span>
+                </span>
+              </label>
               <StarInput value={form[key]} onChange={(v) => setForm((f) => ({ ...f, [key]: v }))} />
             </div>
           ))}

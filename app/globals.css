@@ -151,6 +151,20 @@ textarea {
 }
 .tabs button.active { background: var(--green-mid); color: var(--cream); border-color: var(--green-mid); }
 
+/* Tooltips */
+.tip {
+  position: relative; display: inline-block; margin-left: 6px;
+  color: var(--muted); font-size: 12px; cursor: help; outline: none;
+}
+.tip .tip-box {
+  visibility: hidden; opacity: 0; position: absolute; bottom: 140%; left: 50%;
+  transform: translateX(-50%); width: 190px; background: var(--green-deep);
+  color: var(--cream); font-size: 12px; line-height: 1.4; padding: 8px 10px;
+  border-radius: 8px; text-align: center; z-index: 10; transition: opacity .12s;
+  pointer-events: none;
+}
+.tip:hover .tip-box, .tip:focus .tip-box { visibility: visible; opacity: 1; }
+
 /* Pager */
 .pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin: -36px 0 48px; }
 .pager .btn { margin-top: 0; }
