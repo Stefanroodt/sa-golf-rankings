@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import RankingsExplorer from '../components/RankingsExplorer';
+import PlayedProgress from '../components/PlayedProgress';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
 export const revalidate = 60;
@@ -24,6 +25,7 @@ export default async function Home() {
       </section>
 
       <div className="container">
+        <PlayedProgress />
         <div className="province-links">
           {PROVINCES.map((p) => (
             <Link key={p} href={`/province/${provinceSlug(p)}`}>{p}</Link>
