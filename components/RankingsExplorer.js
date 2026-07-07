@@ -118,12 +118,6 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
         ))}
       </ol>
 
-      {played && (
-        <p className="notice" style={{ textAlign: 'center', marginTop: -8, marginBottom: 24 }}>
-          You&apos;ve played &amp; rated {played.size} of {courses.length} courses
-          {visible.some((c) => !played.has(c.id)) ? ' — spot one you know above?' : ''}
-        </p>
-      )}
       {visible.length > PAGE && (
         <div className="pager">
           <button
