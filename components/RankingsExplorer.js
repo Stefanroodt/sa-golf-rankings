@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-const PAGE = 50;
+const PAGE = 20;
 
 function Stars({ value }) {
   const full = Math.round(value);
@@ -15,7 +15,7 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
   const [holes, setHoles] = useState('All courses');
   const [sort, setSort] = useState('Ranking');
   const [query, setQuery] = useState('');
-  const [shown, setShown] = useState(PAGE);
+  const [page, setPage] = useState(0);
 
   const sorters = {
     'Ranking': (a, b) => b.score - a.score || b.n_ratings - a.n_ratings || a.name.localeCompare(b.name),
@@ -43,28 +43,30 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
     <>
       <div className="controls">
         {!hideProvinceFilter && (
-          <select value={province} onChange={(e) => { setProvince(e.target.value); setShown(PAGE); }}>
+          <select value={province} onChange={(e) => { setProvince(e.target.value); setPage(0); }}>
             {['All provinces', ...provinces].map((p) => <option key={p}>{p}</option>)}
           </select>
         )}
-        <select value={holes} onChange={(e) => { setHoles(e.target.value); setShown(PAGE); }}>
+        <select value={holes} onChange={(e) => { setHoles(e.target.value); setPage(0); }}>
           {['All courses', '18-hole', '9-hole'].map((h) => <option key={h}>{h}</option>)}
         </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+        <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(0); }}>
           {Object.keys(sorters).map((s) => <option key={s}>{s}</option>)}
         </select>
         <input
           placeholder="Search course or town…"
           value={query}
-          onChange={(e) => { setQuery(e.target.value); setShown(PAGE); }}
+          onChange={(e) => { setQuery(e.target.value); setPage(0); }}
         />
       </div>
 
       <ol className="rank-list">
-        {visible.slice(0, shown).map((c, i) => (
+        {visible.slice(page * PAGE, (page + 1) * PAGE).map((c, i) => (
           <li key={c.id}>
             <Link href={`/course/${c.slug}`} className="rank-card">
-              <div className={`rank-num${i < 3 && sort === 'Ranking' ? ' top' : ''}`}>{i + 1}</div>
+              <div className={`rank-num${page === 0 && i < 3 && sort === 'Ranking' ? ' top' : ''}`}>
+                {page * PAGE + i + 1}
+              </div>
               <div className="rank-info">
                 <h3>
                   {c.name}
@@ -92,12 +94,26 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
         ))}
       </ol>
 
-      {visible.length > shown && (
-        <p style={{ textAlign: 'center', marginBottom: 48 }}>
-          <button className="btn" onClick={() => setShown(shown + PAGE)}>
-            Show more ({visible.length - shown} remaining)
+      {visible.length > PAGE && (
+        <div className="pager">
+          <button
+            className="btn"
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+          >
+            ‹ Previous
           </button>
-        </p>
+          <span className="pager-info">
+            Page {page + 1} of {Math.ceil(visible.length / PAGE)} · {visible.length} courses
+          </span>
+          <button
+            className="btn"
+            disabled={(page + 1) * PAGE >= visible.length}
+            onClick={() => setPage(page + 1)}
+          >
+            Next ›
+          </button>
+        </div>
       )}
     </>
   );

@@ -29,8 +29,10 @@ export default async function Home() {
           ))}
         </div>
 
+        <RankingsExplorer courses={courses} provinces={PROVINCES} />
+
         {(recent.length > 0 || reviewers.length > 0) && (
-          <div className="activity-grid">
+          <div className="activity-grid" style={{ margin: '6px 0 48px' }}>
             {recent.length > 0 && (
               <div className="card">
                 <h2>Recently rated</h2>
@@ -40,7 +42,7 @@ export default async function Home() {
                       <Link href={`/course/${r.courses.slug}`} style={{ textDecoration: 'underline' }}>
                         {r.courses.name}
                       </Link>
-                      <span className="stars" style={{ marginLeft: 8 }}>{'★'.repeat(r.overall)}</span>
+                      <span className="stars" style={{ marginLeft: 8 }}>{'★'.repeat(Math.round(r.overall))}</span>
                       <span className="when">by {r.display_name}</span>
                     </span>
                     {r.comment && <p>{r.comment.slice(0, 120)}{r.comment.length > 120 ? '…' : ''}</p>}
@@ -63,8 +65,6 @@ export default async function Home() {
             )}
           </div>
         )}
-
-        <RankingsExplorer courses={courses} provinces={PROVINCES} />
       </div>
     </>
   );
