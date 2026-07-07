@@ -1,6 +1,6 @@
 import { getAllSlugs, PROVINCES, provinceSlug } from '../lib/server';
 
-const BASE = 'https://sa-golf-rankings.vercel.app';
+const BASE = 'https://pinhigh.co.za';
 
 export default async function sitemap() {
   const slugs = await getAllSlugs();

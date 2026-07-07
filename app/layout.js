@@ -2,7 +2,8 @@ import './globals.css';
 import Nav from '../components/Nav';
 
 export const metadata = {
-  title: 'Fairway Rank ZA — South Africa\'s golf courses, ranked by golfers',
+  metadataBase: new URL('https://pinhigh.co.za'),
+  title: 'Pin High — South Africa\'s golf courses, ranked by golfers',
   description:
     'South African golf course rankings powered entirely by ratings from everyday golfers. Rate the courses you\'ve played and shape the list.',
 };
@@ -15,7 +16,7 @@ export default function RootLayout({ children }) {
           <Nav />
           <main>{children}</main>
           <footer>
-            Fairway Rank ZA — rankings decided by golfers, not panels.
+            Pin High — rankings decided by golfers, not panels.
           </footer>
         </div>
       </body>

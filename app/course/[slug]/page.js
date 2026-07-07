@@ -12,7 +12,7 @@ export async function generateMetadata({ params }) {
   const course = await getCourse(params.slug);
   if (!course) return {};
   return {
-    title: `${course.name} — golfer reviews & ratings | FairwayRank ZA`,
+    title: `${course.name} — golfer reviews & ratings | Pin High`,
     description:
       course.description ||
       `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, conditions, layout, clubhouse and staff.`,

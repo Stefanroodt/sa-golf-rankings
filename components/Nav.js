@@ -19,7 +19,7 @@ export default function Nav() {
     <nav className="nav">
       <div className="container nav-inner">
         <Link href="/" className="logo">
-          Fairway<span>Rank</span> ZA
+          Pin<span>High</span>
         </Link>
         <div className="nav-links">
           <Link href="/">Rankings</Link>

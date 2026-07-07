@@ -4,8 +4,8 @@ import { useState } from 'react';
 
 export default function ShareButtons({ name, slug }) {
   const [copied, setCopied] = useState(false);
-  const url = `https://sa-golf-rankings.vercel.app/course/${slug}`;
-  const text = `Rate ${name} on FairwayRank ZA — SA golf courses ranked by golfers`;
+  const url = `https://pinhigh.co.za/course/${slug}`;
+  const text = `Rate ${name} on Pin High — SA golf courses ranked by golfers`;
 
   return (
     <div className="share-row">
