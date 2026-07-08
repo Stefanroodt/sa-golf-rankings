@@ -10,6 +10,11 @@ export const metadata = {
   alternates: { canonical: '/' },
   manifest: '/manifest.json',
   icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
   openGraph: {
