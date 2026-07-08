@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 const PAGE = 20;
 
@@ -33,6 +33,12 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
   const [sort, setSort] = useState('Ranking');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
+  const topRef = useRef(null);
+
+  const goToPage = (p) => {
+    setPage(p);
+    topRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
+  };
 
   const metricMap = METRIC_SETS[kind] || METRIC_SETS.course;
   const sorters = {
@@ -63,7 +69,7 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
 
   return (
     <>
-      <div className="controls">
+      <div className="controls" ref={topRef} style={{ scrollMarginTop: 16 }}>
         {!hideProvinceFilter && (
           <select value={province} onChange={(e) => { setProvince(e.target.value); setPage(0); }}>
             {['All provinces', ...provinces].map((p) => <option key={p}>{p}</option>)}
@@ -122,7 +128,7 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
           <button
             className="btn"
             disabled={page === 0}
-            onClick={() => setPage(page - 1)}
+            onClick={() => goToPage(page - 1)}
           >
             ‹ Previous
           </button>
@@ -132,7 +138,7 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
           <button
             className="btn"
             disabled={(page + 1) * PAGE >= visible.length}
-            onClick={() => setPage(page + 1)}
+            onClick={() => goToPage(page + 1)}
           >
             Next ›
           </button>
