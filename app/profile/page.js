@@ -4,26 +4,61 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 
+function weekKey(d) {
+  const date = new Date(d);
+  const jan1 = new Date(date.getFullYear(), 0, 1);
+  const week = Math.floor(((date - jan1) / 86400000 + jan1.getDay()) / 7);
+  return `${date.getFullYear()}-${week}`;
+}
+
+function computeStreak(dates) {
+  if (!dates.length) return 0;
+  const weeks = new Set(dates.map(weekKey));
+  let streak = 0;
+  const now = new Date();
+  for (let i = 0; i < 520; i++) {
+    const d = new Date(now.getTime() - i * 7 * 86400000);
+    if (weeks.has(weekKey(d))) streak++;
+    else if (i > 0) break;
+    else if (!weeks.has(weekKey(d))) break;
+  }
+  return streak;
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState(undefined);
   const [ratings, setRatings] = useState([]);
   const [total, setTotal] = useState(null);
+  const [n19, setN19] = useState(0);
+  const [dates19, setDates19] = useState([]);
+  const [nPhotos, setNPhotos] = useState(0);
+  const [provinceTotals, setProvinceTotals] = useState({});
 
   useEffect(() => {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       setUser(u.user);
       if (u.user) {
-        const [{ data: r }, { count }] = await Promise.all([
-          supabase
-            .from('ratings')
-            .select('overall, comment, created_at, courses(name, slug, town, province)')
-            .eq('user_id', u.user.id)
-            .order('created_at', { ascending: false }),
-          supabase.from('courses').select('id', { count: 'exact', head: true }),
-        ]);
+        const [{ data: r }, { count }, { data: r19 }, { count: photos }, { data: allCourses }] =
+          await Promise.all([
+            supabase
+              .from('ratings')
+              .select('overall, comment, created_at, courses(name, slug, town, province)')
+              .eq('user_id', u.user.id)
+              .order('created_at', { ascending: false }),
+            supabase.from('courses').select('id', { count: 'exact', head: true }),
+            supabase.from('nineteenth_ratings').select('created_at').eq('user_id', u.user.id),
+            supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
+            supabase.from('courses').select('province'),
+          ]);
         setRatings(r || []);
         setTotal(count);
+        setN19((r19 || []).length);
+        setDates19((r19 || []).map((x) => x.created_at));
+        setNPhotos(photos || 0);
+        const totals = {};
+        for (const c of allCourses || []) totals[c.province] = (totals[c.province] || 0) + 1;
+        setProvinceTotals(totals);
       }
     })();
   }, []);
@@ -35,26 +70,63 @@ export default function ProfilePage() {
       <div className="container auth-wrap">
         <div className="card">
           <h2>Your profile</h2>
-          <p className="notice">Sign in to see your ratings and played-courses list.</p>
+          <p className="notice">Sign in to see your ratings, badges and played-courses list.</p>
           <Link href="/auth" className="btn btn-gold">Sign in / create account</Link>
         </div>
       </div>
     );
 
+  const n = ratings.length;
+  const byProvince = {};
+  for (const r of ratings) {
+    const p = r.courses?.province;
+    if (p) byProvince[p] = (byProvince[p] || 0) + 1;
+  }
+  const bestProvince = Object.entries(byProvince).sort((a, b) => b[1] - a[1])[0];
+  const streak = computeStreak([...ratings.map((r) => r.created_at), ...dates19]);
+
+  const badges = [
+    { name: 'Opening Drive', desc: 'Rate your first course', have: n, goal: 1 },
+    { name: 'Front Nine', desc: 'Rate 9 courses', have: n, goal: 9 },
+    { name: 'Back Nine', desc: 'Rate 18 courses', have: n, goal: 18 },
+    { name: 'Halfway House', desc: 'Rate 50 courses', have: n, goal: 50 },
+    { name: 'Century Club', desc: 'Rate 100 courses', have: n, goal: 100 },
+    { name: 'Grand Tour', desc: 'Rate 250 courses', have: n, goal: 250 },
+    { name: '19th Hole Regular', desc: 'Rate 10 19th holes', have: n19, goal: 10 },
+    { name: 'Clubhouse Legend', desc: 'Rate 25 19th holes', have: n19, goal: 25 },
+    { name: 'Snapper', desc: 'Share 5 course photos', have: nPhotos, goal: 5 },
+    {
+      name: 'Province Explorer',
+      desc: 'Rate 10 courses in one province',
+      have: bestProvince ? bestProvince[1] : 0,
+      goal: 10,
+    },
+    ...Object.entries(provinceTotals).map(([p, t]) => ({
+      name: `${p} Master`,
+      desc: `Rate all ${t} courses in ${p}`,
+      have: byProvince[p] || 0,
+      goal: t,
+      quiet: !(byProvince[p] >= t || (byProvince[p] || 0) >= 10),
+    })),
+  ].filter((b) => !b.quiet);
+
+  const earned = badges.filter((b) => b.have >= b.goal);
+
   return (
     <>
       <section className="course-head">
         <div className="container">
-          <h1>{user.user_metadata?.display_name || user.email}</h1>
+          <h1>{user.user_metadata?.display_name || user.user_metadata?.full_name || user.email}</h1>
           <div className="meta">
-            {ratings.length} course{ratings.length === 1 ? '' : 's'} played &amp; rated
-            {total ? ` of ${total}` : ''}
+            {n} course{n === 1 ? '' : 's'} played &amp; rated{total ? ` of ${total}` : ''} ·{' '}
+            {earned.length} badge{earned.length === 1 ? '' : 's'}
+            {streak > 1 ? ` · ${streak}-week rating streak` : ''}
           </div>
           {total > 0 && (
             <div className="progress-track">
               <div
                 className="progress-fill"
-                style={{ width: `${Math.min(100, (ratings.length / total) * 100)}%` }}
+                style={{ width: `${Math.min(100, (n / total) * 100)}%` }}
               />
             </div>
           )}
@@ -62,10 +134,30 @@ export default function ProfilePage() {
       </section>
       <div className="container" style={{ margin: '28px auto 60px' }}>
         <div className="card">
+          <h2>Badges</h2>
+          <div className="badge-grid">
+            {badges.map((b) => {
+              const done = b.have >= b.goal;
+              return (
+                <div key={b.name} className={`badge-tile${done ? ' earned' : ''}`}>
+                  <span className="badge-medal">{done ? '★' : '☆'}</span>
+                  <strong>{b.name}</strong>
+                  <span className="badge-desc">{b.desc}</span>
+                  <span className="badge-progress">
+                    {done ? 'Earned' : `${Math.min(b.have, b.goal)}/${b.goal}`}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="card" style={{ marginTop: 18 }}>
           <h2>Your ratings</h2>
           {ratings.length === 0 && (
             <p className="notice">
-              Nothing yet — find a course you&apos;ve played on the <Link href="/" style={{ textDecoration: 'underline' }}>rankings</Link> and rate it.
+              Nothing yet — find a course you&apos;ve played on the{' '}
+              <Link href="/rate" style={{ textDecoration: 'underline' }}>rate page</Link> and get your first badge.
             </p>
           )}
           {ratings.map((r, i) => (
@@ -74,7 +166,7 @@ export default function ProfilePage() {
                 <Link href={`/course/${r.courses.slug}`} style={{ textDecoration: 'underline' }}>
                   {r.courses.name}
                 </Link>
-                <span className="stars" style={{ marginLeft: 8 }}>{'★'.repeat(r.overall)}</span>
+                <span className="stars" style={{ marginLeft: 8 }}>{'★'.repeat(Math.round(r.overall))}</span>
                 <span className="when">
                   {r.courses.town}, {r.courses.province} · {new Date(r.created_at).toLocaleDateString('en-ZA', { year: 'numeric', month: 'short' })}
                 </span>
