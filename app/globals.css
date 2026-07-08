@@ -277,3 +277,61 @@ footer {
 }
 .page { min-height: 100vh; display: flex; flex-direction: column; }
 .page > main { flex: 1; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 640px) {
+  .container { padding: 0 14px; }
+
+  .nav { padding: 10px 0; }
+  .nav-inner { flex-wrap: wrap; row-gap: 8px; }
+  .logo { font-size: 17px; }
+  .nav-links { gap: 12px; font-size: 13px; flex-wrap: wrap; }
+
+  .hero { padding: 32px 0 28px; }
+  .hero p { font-size: 14.5px; }
+
+  .controls { gap: 8px; }
+  .controls select { flex: 1 1 45%; font-size: 13px; padding: 8px 8px; }
+  .controls input { flex: 1 1 100%; }
+
+  .rank-card { padding: 12px 12px; gap: 10px; }
+  .rank-num { min-width: 28px; font-size: 17px; }
+  .rank-info h3 { font-size: 15px; }
+  .rank-info .meta { font-size: 12px; }
+  .score-big { font-size: 17px; }
+  .stars { font-size: 12px; }
+  .score-sub { font-size: 11px; }
+  .badge { font-size: 10px; padding: 2px 6px; }
+
+  .two-col { gap: 16px; margin: 18px 0 44px; }
+  .card { padding: 16px; }
+  .cat-label { width: 78px; font-size: 12px; }
+
+  .star-input button { font-size: 28px; padding: 0 5px; }
+
+  .province-links { gap: 6px; }
+  .province-links a { font-size: 12px; padding: 5px 10px; }
+
+  .activity-grid { gap: 12px; }
+  .played-progress { padding: 12px 14px; }
+
+  .pager { gap: 10px; }
+  .pager .btn { padding: 9px 14px; font-size: 13px; }
+  .pager-info { font-size: 12px; }
+
+  .modal-overlay { padding: 20px 12px; align-items: flex-start; }
+  .modal { padding: 16px; }
+
+  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+  .photo-grid img { height: 92px; }
+
+  .post-body { margin: 20px auto 44px; }
+  .course-head { padding: 26px 0; }
+
+  footer { font-size: 12px; padding: 16px 14px; }
+}
+
+@media (max-width: 420px) {
+  .nav-user { display: none; }
+  .rate-row label { font-size: 13px; }
+}

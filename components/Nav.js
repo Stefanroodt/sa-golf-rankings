@@ -52,7 +52,7 @@ export default function Nav() {
                   ⛳ {played.mine}/{played.total}
                 </Link>
               )}
-              <Link href="/profile" style={{ opacity: 0.9 }}>
+              <Link href="/profile" className="nav-user" style={{ opacity: 0.9 }}>
                 {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email}
               </Link>
               <a
