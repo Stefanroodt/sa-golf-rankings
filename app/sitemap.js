@@ -13,6 +13,7 @@ export default async function sitemap() {
     { url: `${BASE}/rate`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE}/leaderboard`, changeFrequency: 'daily', priority: 0.6 },
     { url: `${BASE}/draw`, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${BASE}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
     ...POSTS.map((p) => ({
       url: `${BASE}/blog/${p.slug}`,
       changeFrequency: 'monthly',

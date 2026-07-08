@@ -63,6 +63,7 @@ export default function RootLayout({ children }) {
               <a href="/leaderboard">Leaderboard</a>
               <a href="/blog">Blog</a>
               <a href="/about">About</a>
+              <a href="/privacy">Privacy</a>
             </div>
             Pin High — rankings decided by golfers, not panels.
           </footer>
