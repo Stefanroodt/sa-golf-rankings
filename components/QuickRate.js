@@ -5,9 +5,15 @@ import { useEffect, useState } from 'react';
 import { supabase, CATEGORIES19 } from '../lib/supabase';
 import RatePanel from './RatePanel';
 
+const PROVINCES = [
+  'All provinces', 'Western Cape', 'Eastern Cape', 'KwaZulu-Natal', 'Gauteng',
+  'Mpumalanga', 'Limpopo', 'North West', 'Free State', 'Northern Cape',
+];
+
 export default function QuickRate() {
   const [courses, setCourses] = useState(null);
   const [q, setQ] = useState('');
+  const [province, setProvince] = useState('All provinces');
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
@@ -18,15 +24,18 @@ export default function QuickRate() {
       .then(({ data }) => setCourses(data || []));
   }, []);
 
+  const searching = q.trim().length > 1 || province !== 'All provinces';
   const matches =
-    q.trim().length > 1 && courses
+    searching && courses
       ? courses
           .filter(
             (c) =>
-              c.name.toLowerCase().includes(q.toLowerCase()) ||
-              c.town.toLowerCase().includes(q.toLowerCase())
+              (province === 'All provinces' || c.province === province) &&
+              (q.trim().length <= 1 ||
+                c.name.toLowerCase().includes(q.toLowerCase()) ||
+                c.town.toLowerCase().includes(q.toLowerCase()))
           )
-          .slice(0, 8)
+          .slice(0, 10)
       : [];
 
   return (
@@ -34,6 +43,11 @@ export default function QuickRate() {
       {!selected && (
         <div className="card" style={{ marginTop: 24 }}>
           <h2>Find your course</h2>
+          <div className="controls" style={{ margin: '0 0 4px' }}>
+            <select value={province} onChange={(e) => setProvince(e.target.value)}>
+              {PROVINCES.map((p) => <option key={p}>{p}</option>)}
+            </select>
+          </div>
           <input
             className="rate-search"
             placeholder="Start typing a course or town… e.g. Fancourt, Knysna, Benoni"
@@ -41,7 +55,7 @@ export default function QuickRate() {
             onChange={(e) => setQ(e.target.value)}
             autoFocus
           />
-          {!courses && q.trim().length > 1 && <p className="notice">Loading courses…</p>}
+          {!courses && searching && <p className="notice">Loading courses…</p>}
           {matches.map((c) => (
             <button key={c.id} className="search-result" onClick={() => { setSelected(c); setQ(''); }}>
               <span>
@@ -53,7 +67,7 @@ export default function QuickRate() {
               <span className="pick">Rate →</span>
             </button>
           ))}
-          {courses && q.trim().length > 1 && matches.length === 0 && (
+          {courses && searching && matches.length === 0 && (
             <p className="notice">
               No match — try a shorter search, or check the{' '}
               <Link href="/" style={{ textDecoration: 'underline' }}>full rankings</Link>.
