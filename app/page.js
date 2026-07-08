@@ -23,6 +23,9 @@ export default async function Home() {
             favourites? Rate them and have your say.
           </p>
           <FeedbackButton />
+          <Link href="/19th-holes" className="hero-nineteenth">
+            Best 19th Holes ⛳
+          </Link>
         </div>
       </section>
 
