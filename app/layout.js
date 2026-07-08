@@ -1,5 +1,6 @@
 import './globals.css';
 import Nav from '../components/Nav';
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata = {
   metadataBase: new URL('https://pinhigh.co.za'),
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
             Pin High — rankings decided by golfers, not panels.
           </footer>
         </div>
+        <Analytics />
       </body>
     </html>
   );
