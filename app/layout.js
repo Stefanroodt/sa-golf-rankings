@@ -47,6 +47,7 @@ export default function RootLayout({ children }) {
             <div className="footer-links">
               <a href="/">Rankings</a>
               <a href="/19th-holes">19th Holes</a>
+              <a href="/leaderboard">Leaderboard</a>
               <a href="/blog">Blog</a>
               <a href="/about">About</a>
             </div>

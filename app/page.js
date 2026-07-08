@@ -70,6 +70,11 @@ export default async function Home() {
                     </span>
                   </div>
                 ))}
+                <p className="notice" style={{ marginTop: 10 }}>
+                  <Link href="/leaderboard" style={{ textDecoration: 'underline' }}>
+                    Full badges leaderboard →
+                  </Link>
+                </p>
               </div>
             )}
           </div>

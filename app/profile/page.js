@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { computeBadges, earnedBadges } from '../../lib/badges';
 
 function weekKey(d) {
   const date = new Date(d);
@@ -82,35 +83,9 @@ export default function ProfilePage() {
     const p = r.courses?.province;
     if (p) byProvince[p] = (byProvince[p] || 0) + 1;
   }
-  const bestProvince = Object.entries(byProvince).sort((a, b) => b[1] - a[1])[0];
   const streak = computeStreak([...ratings.map((r) => r.created_at), ...dates19]);
-
-  const badges = [
-    { name: 'Opening Drive', desc: 'Rate your first course', have: n, goal: 1 },
-    { name: 'Front Nine', desc: 'Rate 9 courses', have: n, goal: 9 },
-    { name: 'Back Nine', desc: 'Rate 18 courses', have: n, goal: 18 },
-    { name: 'Halfway House', desc: 'Rate 50 courses', have: n, goal: 50 },
-    { name: 'Century Club', desc: 'Rate 100 courses', have: n, goal: 100 },
-    { name: 'Grand Tour', desc: 'Rate 250 courses', have: n, goal: 250 },
-    { name: '19th Hole Regular', desc: 'Rate 10 19th holes', have: n19, goal: 10 },
-    { name: 'Clubhouse Legend', desc: 'Rate 25 19th holes', have: n19, goal: 25 },
-    { name: 'Snapper', desc: 'Share 5 course photos', have: nPhotos, goal: 5 },
-    {
-      name: 'Province Explorer',
-      desc: 'Rate 10 courses in one province',
-      have: bestProvince ? bestProvince[1] : 0,
-      goal: 10,
-    },
-    ...Object.entries(provinceTotals).map(([p, t]) => ({
-      name: `${p} Master`,
-      desc: `Rate all ${t} courses in ${p}`,
-      have: byProvince[p] || 0,
-      goal: t,
-      quiet: !(byProvince[p] >= t || (byProvince[p] || 0) >= 10),
-    })),
-  ].filter((b) => !b.quiet);
-
-  const earned = badges.filter((b) => b.have >= b.goal);
+  const badges = computeBadges({ n, n19, nPhotos, byProvince, provinceTotals });
+  const earned = earnedBadges(badges);
 
   return (
     <>
@@ -134,7 +109,12 @@ export default function ProfilePage() {
       </section>
       <div className="container" style={{ margin: '28px auto 60px' }}>
         <div className="card">
-          <h2>Badges</h2>
+          <h2>
+            Badges{' '}
+            <Link href="/leaderboard" style={{ fontSize: 13, fontWeight: 400, textDecoration: 'underline', color: 'var(--muted)' }}>
+              — see the leaderboard
+            </Link>
+          </h2>
           <div className="badge-grid">
             {badges.map((b) => {
               const done = b.have >= b.goal;

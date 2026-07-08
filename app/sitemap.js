@@ -11,6 +11,7 @@ export default async function sitemap() {
     { url: `${BASE}/blog`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE}/about`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${BASE}/rate`, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/leaderboard`, changeFrequency: 'daily', priority: 0.6 },
     ...POSTS.map((p) => ({
       url: `${BASE}/blog/${p.slug}`,
       changeFrequency: 'monthly',
