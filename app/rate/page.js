@@ -4,7 +4,7 @@ import QuickRate from '../../components/QuickRate';
 export const metadata = {
   title: 'Rate a course | Pin High',
   description:
-    'Find any of South Africa\'s 413 golf courses and rate it in 30 seconds — the course, the 19th hole, or both.',
+    'Find any of South Africa\'s 400-plus golf courses and rate it in 30 seconds — the course, the 19th hole, or both.',
   alternates: { canonical: '/rate' },
 };
 

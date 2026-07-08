@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'About Pin High — how the rankings work',
   description:
-    'Pin High ranks all 413 GolfRSA-affiliated golf courses in South Africa using ratings from everyday golfers. Here\'s exactly how the rankings are calculated.',
+    'Pin High ranks every GolfRSA-affiliated golf course in South Africa using ratings from everyday golfers. Here\'s exactly how the rankings are calculated.',
   alternates: { canonical: '/about' },
 };
 
@@ -14,7 +14,7 @@ const FAQS = [
   },
   {
     q: 'Which courses are included?',
-    a: 'All 413 GolfRSA-affiliated golf courses in South Africa, across all nine provinces — from championship estates to 9-hole country clubs. If a course is missing, use the feedback button on the homepage and we\'ll add it.',
+    a: 'Every GolfRSA-affiliated golf course in South Africa — more than 400 — across all nine provinces — from championship estates to 9-hole country clubs. If a course is missing, use the feedback button on the homepage and we\'ll add it.',
   },
   {
     q: 'Who can rate a course?',
@@ -54,7 +54,7 @@ export default function About() {
         <article className="post-body">
           <p>
             Pin High ranks every GolfRSA-affiliated golf course in South Africa —
-            all 413 of them — using ratings from golfers who have actually played
+            more than 400 of them — using ratings from golfers who have actually played
             them. There is no panel and no editorial thumb on the scale: the
             rankings are a live, weighted average of golfer ratings, and they
             move whenever someone adds theirs.
