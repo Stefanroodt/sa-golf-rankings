@@ -10,7 +10,7 @@ export const metadata = {
 const FAQS = [
   {
     q: 'How are Pin High\'s golf course rankings decided?',
-    a: 'Entirely by golfers. Registered users rate courses they have played on six categories — overall, value, conditions, layout, clubhouse and staff — from 1 to 5 stars. Rankings are ordered by a weighted average of overall ratings, where courses with more ratings rank more reliably than courses with few. No panel, no editorial input, and no course can pay to move up.',
+    a: 'Entirely by golfers. Registered users rate courses they have played on five categories — value, conditions, layout, clubhouse and staff — from 1 to 5 stars, and the overall score is the average. Rankings are ordered by average overall rating, with ties broken by the number of ratings, and every card shows how many ratings sit behind the score. No panel, no editorial input, and no course can pay to move up.',
   },
   {
     q: 'Which courses are included?',
