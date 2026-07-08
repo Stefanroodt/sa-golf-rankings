@@ -24,7 +24,8 @@ export default function RatePanel({
 }) {
   const router = useRouter();
   const table = kind === 'nineteenth' ? 'nineteenth_ratings' : 'ratings';
-  const empty = Object.fromEntries(categories.map((c) => [c.key, 0]));
+  const inputCats = categories.filter((c) => c.key !== 'overall');
+  const empty = Object.fromEntries(inputCats.map((c) => [c.key, 0]));
   const [user, setUser] = useState(undefined);
   const [form, setForm] = useState(empty);
   const [comment, setComment] = useState('');
@@ -41,7 +42,7 @@ export default function RatePanel({
           .from(table).select('*')
           .eq('course_id', course.id).eq('user_id', u.user.id).maybeSingle();
         if (mine) {
-          setForm(Object.fromEntries(categories.map(({ key }) => [key, Number(mine[key])])));
+          setForm(Object.fromEntries(inputCats.map(({ key }) => [key, Number(mine[key])])));
           setComment(mine.comment || '');
         }
       }
@@ -52,7 +53,7 @@ export default function RatePanel({
   async function submit(e) {
     e.preventDefault();
     setStatus(null);
-    const unrated = categories.filter(({ key }) => !form[key]).map(({ key }) => key);
+    const unrated = inputCats.filter(({ key }) => !form[key]).map(({ key }) => key);
     if (unrated.length) {
       setMissing(unrated);
       setStatus({ type: 'error', msg: 'Almost there — the categories marked below still need stars.' });
@@ -100,13 +101,13 @@ export default function RatePanel({
         </>
       ) : (
         <form onSubmit={submit}>
-          {!categories.some(({ key }) => form[key]) && (
+          {!inputCats.some(({ key }) => form[key]) && (
             <p className="notice" style={{ marginTop: 0, marginBottom: 12 }}>
               First rating? Tap the stars for each category — 1 star is poor, 5 is
-              world class. Hover the ⓘ if you&apos;re unsure what something means.
+              world class. Your overall score is calculated automatically.
             </p>
           )}
-          {categories.map(({ key, label, hint }) => (
+          {inputCats.map(({ key, label, hint }) => (
             <div className="rate-row" key={key}>
               <label style={missing.includes(key) ? { color: 'var(--danger)', fontWeight: 600 } : undefined}>
                 {label}
@@ -124,6 +125,17 @@ export default function RatePanel({
               />
             </div>
           ))}
+          {inputCats.every(({ key }) => form[key]) && (
+            <div className="rate-row" style={{ borderTop: '1px solid var(--cream-dark)', paddingTop: 10 }}>
+              <label style={{ fontWeight: 700 }}>Overall</label>
+              <span className="score-big" style={{ fontSize: 18 }}>
+                {(
+                  inputCats.reduce((s, { key }) => s + form[key], 0) / inputCats.length
+                ).toFixed(2)}
+                <span className="stars" style={{ marginLeft: 8, fontSize: 14 }}>★</span>
+              </span>
+            </div>
+          )}
           <textarea
             placeholder="Optional: a sentence or two…"
             value={comment} onChange={(e) => setComment(e.target.value)} maxLength={600}

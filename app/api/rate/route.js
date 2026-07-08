@@ -46,12 +46,17 @@ export async function POST(req) {
     return Response.json({ error: 'Comment too long (600 max).' }, { status: 400 });
 
   const scores = {};
-  for (const key of cfg.cats) {
+  const inputCats = cfg.cats.filter((c) => c !== 'overall');
+  for (const key of inputCats) {
     const n = Number(body[key]);
     if (!Number.isFinite(n) || n < 1 || n > 5)
       return Response.json({ error: `Rate every category 1–5 (${key}).` }, { status: 400 });
     scores[key] = n;
   }
+  // Overall is always the average of the category scores.
+  scores.overall = Number(
+    (inputCats.reduce((s, k) => s + scores[k], 0) / inputCats.length).toFixed(2)
+  );
 
   const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
   const ip_hash = createHash('sha256').update('pinhigh-salt:' + ip).digest('hex').slice(0, 32);
