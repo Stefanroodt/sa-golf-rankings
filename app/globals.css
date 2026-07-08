@@ -194,9 +194,14 @@ a { color: inherit; text-decoration: none; }
 .rate-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .rate-row label { font-size: 14px; }
 .star-input button {
-  background: none; border: none; font-size: 22px; cursor: pointer; color: #d5cdb8; padding: 0 2px;
+  background: none; border: none; font-size: 22px; cursor: pointer;
+  color: #d5cdb8; padding: 0; margin: 0 2px; position: relative; line-height: 1;
 }
-.star-input button.on { color: var(--gold); }
+.star-input .star-base { color: #d5cdb8; }
+.star-input .star-fill {
+  position: absolute; left: 0; top: 0; height: 100%; overflow: hidden;
+  color: var(--gold); pointer-events: none; white-space: nowrap;
+}
 textarea {
   width: 100%; border: 1px solid var(--cream-dark); border-radius: 8px;
   padding: 10px; font-size: 14px; font-family: inherit; min-height: 70px; margin-top: 6px;
@@ -355,7 +360,7 @@ footer {
   .card { padding: 16px; }
   .cat-label { width: 78px; font-size: 12px; }
 
-  .star-input button { font-size: 28px; padding: 0 5px; }
+  .star-input button { font-size: 28px; margin: 0 5px; }
 
   .province-links { gap: 6px; }
   .province-links a { font-size: 12px; padding: 5px 10px; }

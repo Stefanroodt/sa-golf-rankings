@@ -9,8 +9,24 @@ function StarInput({ value, onChange }) {
   return (
     <span className="star-input">
       {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} type="button" className={n <= value ? 'on' : ''}
-          onClick={() => onChange(n)} aria-label={`${n} stars`}>★</button>
+        <button
+          key={n}
+          type="button"
+          aria-label={`${n} stars (tap left half for ${n - 0.5})`}
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const leftHalf = e.clientX - rect.left < rect.width / 2 && e.clientX !== 0;
+            onChange(Math.max(1, leftHalf ? n - 0.5 : n));
+          }}
+        >
+          <span className="star-base">★</span>
+          <span
+            className="star-fill"
+            style={{ width: value >= n ? '100%' : value >= n - 0.5 ? '50%' : '0%' }}
+          >
+            ★
+          </span>
+        </button>
       ))}
     </span>
   );
@@ -116,7 +132,8 @@ export default function RatePanel({
           {!inputCats.some(({ key }) => form[key]) && (
             <p className="notice" style={{ marginTop: 0, marginBottom: 12 }}>
               First rating? Tap the stars for each category — 1 star is poor, 5 is
-              world class. Your overall score is calculated automatically.
+              world class. Tap a star&apos;s left half for half points (e.g. 4.5).
+              Your overall score is calculated automatically.
             </p>
           )}
           {inputCats.map(({ key, label, hint }) => (
