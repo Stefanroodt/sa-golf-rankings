@@ -37,7 +37,7 @@ async function getLeaderboard() {
 
     const users = {};
     const ensure = (id, name) => {
-      if (!users[id]) users[id] = { name: name || 'Golfer', n: 0, n19: 0, nPhotos: 0, byProvince: {} };
+      if (!users[id]) users[id] = { id, name: name || 'Golfer', n: 0, n19: 0, nPhotos: 0, byProvince: {} };
       if (name) users[id].name = name;
       return users[id];
     };
@@ -58,6 +58,7 @@ async function getLeaderboard() {
       .map((u) => {
         const badges = computeBadges({ ...u, provinceTotals });
         return {
+          id: u.id,
           name: u.name,
           n: u.n,
           n19: u.n19,
@@ -95,8 +96,8 @@ export default async function Leaderboard() {
             </p>
           )}
           {rows.map((u, i) => (
-            <li key={u.name + i}>
-              <div className="rank-card">
+            <li key={u.id}>
+              <Link href={`/golfer/${u.id}`} className="rank-card">
                 <div className={`rank-num${i < 3 ? ' top' : ''}`}>{i + 1}</div>
                 <div className="rank-info">
                   <h3>{u.name}</h3>
@@ -110,7 +111,7 @@ export default async function Leaderboard() {
                   <div className="score-big">{u.earned}</div>
                   <div className="score-sub">badge{u.earned === 1 ? '' : 's'}</div>
                 </div>
-              </div>
+              </Link>
             </li>
           ))}
         </ol>
