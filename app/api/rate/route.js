@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { createHash } from 'crypto';
+import { revalidatePath } from 'next/cache';
 
 const SUPABASE_URL = 'https://mwotoycsaphyipbgyecn.supabase.co';
 const ANON_KEY =
@@ -88,6 +89,19 @@ export async function POST(req) {
     { onConflict: 'course_id,user_id' }
   );
   if (error) return Response.json({ error: error.message }, { status: 400 });
+
+  // Bust cached pages so the new rating shows everywhere immediately
+  try {
+    const { data: courseRow } = await db
+      .from('courses').select('slug, province').eq('id', course_id).single();
+    if (courseRow) {
+      revalidatePath(`/course/${courseRow.slug}`);
+      revalidatePath(`/province/${courseRow.province.toLowerCase().replace(/\s+/g, '-')}`);
+    }
+    revalidatePath('/');
+    revalidatePath('/19th-holes');
+    revalidatePath('/leaderboard');
+  } catch {}
 
   return Response.json({ ok: true, suspect });
 }
