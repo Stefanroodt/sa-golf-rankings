@@ -86,6 +86,7 @@ export default function RatePanel({
         ? 'Thanks — your rating was recorded and is pending review.'
         : 'Your rating is in. Thanks for shaping the list!',
     });
+    window.dispatchEvent(new Event('pinhigh:rated'));
     router.refresh();
   }
 

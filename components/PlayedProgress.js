@@ -8,7 +8,7 @@ export default function PlayedProgress() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    (async () => {
+    const fetchCounts = async () => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       const [{ count: mine }, { count: total }] = await Promise.all([
@@ -16,7 +16,10 @@ export default function PlayedProgress() {
         supabase.from('courses').select('id', { count: 'exact', head: true }),
       ]);
       if (mine !== null && total) setStats({ mine, total });
-    })();
+    };
+    fetchCounts();
+    window.addEventListener('pinhigh:rated', fetchCounts);
+    return () => window.removeEventListener('pinhigh:rated', fetchCounts);
   }, []);
 
   if (!stats) return null;

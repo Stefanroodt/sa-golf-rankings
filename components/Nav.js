@@ -18,13 +18,16 @@ export default function Nav() {
 
   useEffect(() => {
     if (!user) { setPlayed(null); return; }
-    (async () => {
+    const fetchCounts = async () => {
       const [{ count: mine }, { count: total }] = await Promise.all([
         supabase.from('ratings').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('courses').select('id', { count: 'exact', head: true }),
       ]);
       if (mine !== null && total !== null) setPlayed({ mine, total });
-    })();
+    };
+    fetchCounts();
+    window.addEventListener('pinhigh:rated', fetchCounts);
+    return () => window.removeEventListener('pinhigh:rated', fetchCounts);
   }, [user]);
 
   return (
