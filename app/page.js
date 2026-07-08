@@ -22,6 +22,7 @@ export default async function Home() {
             course — and you&apos;ve got opinions of your own. Which are your
             favourites? Rate them and have your say.
           </p>
+          <Link href="/rate" className="hero-rate">Rate a course now ★</Link>
           <FeedbackButton />
           <Link href="/19th-holes" className="hero-nineteenth">
             Best 19th Holes ⛳
