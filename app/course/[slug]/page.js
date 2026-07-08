@@ -6,7 +6,7 @@ import ReportButton from '../../../components/ReportButton';
 import PhotoUpload from '../../../components/PhotoUpload';
 import PhotoReportButton from '../../../components/PhotoReportButton';
 import { getCourse, getRatings, getPhotos, photoUrl } from '../../../lib/server';
-import { CATEGORIES } from '../../../lib/supabase';
+import { CATEGORIES, CATEGORIES19 } from '../../../lib/supabase';
 
 export const revalidate = 0; // always fresh
 
@@ -31,13 +31,16 @@ export async function generateMetadata({ params }) {
 export default async function CoursePage({ params }) {
   const course = await getCourse(params.slug);
   if (!course) notFound();
-  const [ratings, photos] = await Promise.all([
+  const [ratings, ratings19, photos] = await Promise.all([
     getRatings(course.id),
+    getRatings(course.id, 'nineteenth_ratings'),
     getPhotos(course.id),
   ]);
 
   const avg = (key) =>
-    ratings.length ? ratings.reduce((s, r) => s + r[key], 0) / ratings.length : 0;
+    ratings.length ? ratings.reduce((s, r) => s + Number(r[key]), 0) / ratings.length : 0;
+  const avg19 = (key) =>
+    ratings19.length ? ratings19.reduce((s, r) => s + Number(r[key]), 0) / ratings19.length : 0;
 
   const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(
     `${course.name} ${course.town} South Africa`
@@ -129,6 +132,39 @@ export default async function CoursePage({ params }) {
               ))}
           </div>
 
+          <div className="card">
+            <h2>
+              The 19th hole{' '}
+              <span style={{ fontWeight: 400, fontSize: 13, color: 'var(--muted)' }}>
+                ({ratings19.length} rating{ratings19.length === 1 ? '' : 's'})
+              </span>
+            </h2>
+            {ratings19.length === 0 && (
+              <p className="notice">
+                How&apos;s the vibe after the round? Be the first to rate this 19th hole.
+              </p>
+            )}
+            {ratings19.length > 0 &&
+              CATEGORIES19.map(({ key, label }) => (
+                <div className="cat-row" key={key}>
+                  <span className="cat-label">{label}</span>
+                  <div className="cat-bar">
+                    <div className="cat-fill" style={{ width: `${(avg19(key) / 5) * 100}%` }} />
+                  </div>
+                  <span className="cat-val">{avg19(key).toFixed(1)}</span>
+                </div>
+              ))}
+            {ratings19.filter((r) => r.comment).map((r) => (
+              <div className="review" key={r.id}>
+                <span className="who">
+                  {r.display_name}
+                  <span className="stars" style={{ marginLeft: 8 }}>{'★'.repeat(Math.round(r.overall))}</span>
+                </span>
+                <p>{r.comment}</p>
+              </div>
+            ))}
+          </div>
+
           {photos.length > 0 && (
             <div className="card">
               <h2>Photos</h2>
@@ -168,6 +204,12 @@ export default async function CoursePage({ params }) {
 
         <div>
           <RatePanel course={course} />
+          <RatePanel
+            course={course}
+            kind="nineteenth"
+            categories={CATEGORIES19}
+            title="Rate the 19th hole"
+          />
           <PhotoUpload courseId={course.id} />
           <div className="card">
             <h2>Share this course</h2>

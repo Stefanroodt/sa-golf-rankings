@@ -255,6 +255,14 @@ textarea {
   cursor: pointer; padding: 0; margin-top: 4px; text-decoration: underline;
 }
 
+/* Blog */
+.blog-item { display: block; margin-bottom: 14px; }
+.blog-item:hover { box-shadow: 0 4px 16px rgba(14,47,33,.12); }
+.blog-item h2 { font-size: 19px; }
+.post-body { max-width: 680px; margin: 28px auto 60px; }
+.post-body h2 { font-size: 19px; margin: 26px 0 8px; }
+.post-body p { font-size: 15.5px; margin-bottom: 14px; }
+
 footer {
   background: var(--green-deep); color: #9db8aa; text-align: center;
   padding: 22px 0; font-size: 13px; margin-top: auto;

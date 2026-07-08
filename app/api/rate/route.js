@@ -5,7 +5,16 @@ const SUPABASE_URL = 'https://mwotoycsaphyipbgyecn.supabase.co';
 const ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13b3RveWNzYXBoeWlwYmd5ZWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyOTQwNjUsImV4cCI6MjA5ODg3MDA2NX0.sYE8SEc6Kl8-2ElBSPH-V8C7JxQVJkA0x-_iUugXI2s';
 
-const CATS = ['overall', 'value', 'conditions', 'layout', 'clubhouse', 'staff'];
+const KINDS = {
+  course: {
+    table: 'ratings',
+    cats: ['overall', 'value', 'conditions', 'layout', 'clubhouse', 'staff'],
+  },
+  nineteenth: {
+    table: 'nineteenth_ratings',
+    cats: ['overall', 'atmosphere', 'drinks', 'food', 'view', 'service'],
+  },
+};
 const MAX_ACCOUNTS_PER_IP_PER_COURSE = 2;
 
 export async function POST(req) {
@@ -28,13 +37,16 @@ export async function POST(req) {
   let body;
   try { body = await req.json(); } catch { return Response.json({ error: 'Bad request.' }, { status: 400 }); }
 
+  const cfg = KINDS[body.kind || 'course'];
+  if (!cfg) return Response.json({ error: 'Unknown rating type.' }, { status: 400 });
+
   const { course_id, comment } = body;
   if (!course_id) return Response.json({ error: 'Missing course.' }, { status: 400 });
   if (comment && String(comment).length > 600)
     return Response.json({ error: 'Comment too long (600 max).' }, { status: 400 });
 
   const scores = {};
-  for (const key of CATS) {
+  for (const key of cfg.cats) {
     const n = Number(body[key]);
     if (!Number.isFinite(n) || n < 1 || n > 5)
       return Response.json({ error: `Rate every category 1–5 (${key}).` }, { status: 400 });
@@ -46,9 +58,8 @@ export async function POST(req) {
 
   const db = createClient(SUPABASE_URL, serviceKey, { auth: { persistSession: false } });
 
-  // How many OTHER accounts have rated this course from this IP?
   const { count } = await db
-    .from('ratings')
+    .from(cfg.table)
     .select('id', { count: 'exact', head: true })
     .eq('course_id', course_id)
     .eq('ip_hash', ip_hash)
@@ -56,7 +67,7 @@ export async function POST(req) {
 
   const suspect = (count ?? 0) >= MAX_ACCOUNTS_PER_IP_PER_COURSE;
 
-  const { error } = await db.from('ratings').upsert(
+  const { error } = await db.from(cfg.table).upsert(
     {
       course_id,
       user_id: user.id,

@@ -43,6 +43,8 @@ export default function Nav() {
         </Link>
         <div className="nav-links">
           <Link href="/">Rankings</Link>
+          <Link href="/19th-holes">19th Holes</Link>
+          <Link href="/blog">Blog</Link>
           {user ? (
             <>
               {played && (

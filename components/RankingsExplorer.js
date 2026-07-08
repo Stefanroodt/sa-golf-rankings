@@ -10,31 +10,43 @@ function Stars({ value }) {
   return <span className="stars">{'★'.repeat(full)}{'☆'.repeat(5 - full)}</span>;
 }
 
-export default function RankingsExplorer({ courses, provinces, hideProvinceFilter }) {
+const METRIC_SETS = {
+  course: {
+    'Best value': 'avg_value',
+    'Best conditions': 'avg_conditions',
+    'Best layout': 'avg_layout',
+    'Best clubhouse': 'avg_clubhouse',
+    'Best staff': 'avg_staff',
+  },
+  nineteenth: {
+    'Best atmosphere': 'avg_atmosphere',
+    'Best drinks': 'avg_drinks',
+    'Best food': 'avg_food',
+    'Best view': 'avg_view',
+    'Best service': 'avg_service',
+  },
+};
+
+export default function RankingsExplorer({ courses, provinces, hideProvinceFilter, kind = 'course' }) {
   const [province, setProvince] = useState('All provinces');
   const [holes, setHoles] = useState('All courses');
   const [sort, setSort] = useState('Ranking');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
 
+  const metricMap = METRIC_SETS[kind] || METRIC_SETS.course;
   const sorters = {
     'Ranking': (a, b) => b.score - a.score || b.n_ratings - a.n_ratings || a.name.localeCompare(b.name),
     'Most rated': (a, b) => b.n_ratings - a.n_ratings || b.score - a.score,
-    'Best value': (a, b) => (b.avg_value ?? 0) - (a.avg_value ?? 0) || b.n_ratings - a.n_ratings,
-    'Best conditions': (a, b) => (b.avg_conditions ?? 0) - (a.avg_conditions ?? 0) || b.n_ratings - a.n_ratings,
-    'Best layout': (a, b) => (b.avg_layout ?? 0) - (a.avg_layout ?? 0) || b.n_ratings - a.n_ratings,
-    'Best clubhouse': (a, b) => (b.avg_clubhouse ?? 0) - (a.avg_clubhouse ?? 0) || b.n_ratings - a.n_ratings,
-    'Best staff': (a, b) => (b.avg_staff ?? 0) - (a.avg_staff ?? 0) || b.n_ratings - a.n_ratings,
+    ...Object.fromEntries(
+      Object.entries(metricMap).map(([label, col]) => [
+        label,
+        (a, b) => (Number(b[col]) || 0) - (Number(a[col]) || 0) || b.n_ratings - a.n_ratings,
+      ])
+    ),
     'A–Z': (a, b) => a.name.localeCompare(b.name),
   };
 
-  const metricMap = {
-    'Best value': 'avg_value',
-    'Best conditions': 'avg_conditions',
-    'Best layout': 'avg_layout',
-    'Best clubhouse': 'avg_clubhouse',
-    'Best staff': 'avg_staff',
-  };
   const metricKey = metricMap[sort] || 'avg_overall';
   const metricLabel = metricMap[sort] ? sort.replace('Best ', '') : 'overall';
 

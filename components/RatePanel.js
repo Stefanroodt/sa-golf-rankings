@@ -16,11 +16,16 @@ function StarInput({ value, onChange }) {
   );
 }
 
-const empty = { overall: 0, value: 0, conditions: 0, layout: 0, clubhouse: 0, staff: 0 };
-
-export default function RatePanel({ course }) {
+export default function RatePanel({
+  course,
+  kind = 'course',
+  categories = CATEGORIES,
+  title = 'Rate this course',
+}) {
   const router = useRouter();
-  const [user, setUser] = useState(undefined); // undefined = loading
+  const table = kind === 'nineteenth' ? 'nineteenth_ratings' : 'ratings';
+  const empty = Object.fromEntries(categories.map((c) => [c.key, 0]));
+  const [user, setUser] = useState(undefined);
   const [form, setForm] = useState(empty);
   const [comment, setComment] = useState('');
   const [status, setStatus] = useState(null);
@@ -33,29 +38,24 @@ export default function RatePanel({ course }) {
       setUser(u.user);
       if (u.user) {
         const { data: mine } = await supabase
-          .from('ratings').select('*')
+          .from(table).select('*')
           .eq('course_id', course.id).eq('user_id', u.user.id).maybeSingle();
         if (mine) {
-          setForm({
-            overall: mine.overall, value: mine.value, conditions: mine.conditions,
-            layout: mine.layout, clubhouse: mine.clubhouse, staff: mine.staff,
-          });
+          setForm(Object.fromEntries(categories.map(({ key }) => [key, Number(mine[key])])));
           setComment(mine.comment || '');
         }
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course.id]);
 
   async function submit(e) {
     e.preventDefault();
     setStatus(null);
-    const unrated = CATEGORIES.filter(({ key }) => !form[key]).map(({ key }) => key);
+    const unrated = categories.filter(({ key }) => !form[key]).map(({ key }) => key);
     if (unrated.length) {
       setMissing(unrated);
-      setStatus({
-        type: 'error',
-        msg: `Almost there — the categories marked below still need stars.`,
-      });
+      setStatus({ type: 'error', msg: 'Almost there — the categories marked below still need stars.' });
       return;
     }
     setMissing([]);
@@ -69,13 +69,13 @@ export default function RatePanel({ course }) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session?.access_token || ''}`,
         },
-        body: JSON.stringify({ course_id: course.id, ...form, comment }),
+        body: JSON.stringify({ kind, course_id: course.id, ...form, comment }),
       });
       result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Something went wrong.');
-    } catch (e) {
+    } catch (e2) {
       setSaving(false);
-      setStatus({ type: 'error', msg: e.message });
+      setStatus({ type: 'error', msg: e2.message });
       return;
     }
     setSaving(false);
@@ -90,7 +90,7 @@ export default function RatePanel({ course }) {
 
   return (
     <div className="card">
-      <h2>Rate this course</h2>
+      <h2>{title}</h2>
       {user === undefined ? (
         <p className="notice">Checking sign-in…</p>
       ) : !user ? (
@@ -100,13 +100,13 @@ export default function RatePanel({ course }) {
         </>
       ) : (
         <form onSubmit={submit}>
-          {!CATEGORIES.some(({ key }) => form[key]) && (
+          {!categories.some(({ key }) => form[key]) && (
             <p className="notice" style={{ marginTop: 0, marginBottom: 12 }}>
               First rating? Tap the stars for each category — 1 star is poor, 5 is
               world class. Hover the ⓘ if you&apos;re unsure what something means.
             </p>
           )}
-          {CATEGORIES.map(({ key, label, hint }) => (
+          {categories.map(({ key, label, hint }) => (
             <div className="rate-row" key={key}>
               <label style={missing.includes(key) ? { color: 'var(--danger)', fontWeight: 600 } : undefined}>
                 {label}
@@ -125,11 +125,11 @@ export default function RatePanel({ course }) {
             </div>
           ))}
           <textarea
-            placeholder="Optional: a sentence or two about your round…"
+            placeholder="Optional: a sentence or two…"
             value={comment} onChange={(e) => setComment(e.target.value)} maxLength={600}
           />
           <button className="btn" disabled={saving}>{saving ? 'Saving…' : 'Submit rating'}</button>
-          <p className="notice">One rating per golfer per course — submitting again updates yours.</p>
+          <p className="notice">One rating per golfer — submitting again updates yours.</p>
           {status && <p className={status.type}>{status.msg}</p>}
         </form>
       )}
