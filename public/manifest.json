@@ -1,0 +1,13 @@
+{
+  "name": "Pin High — SA golf courses, ranked by golfers",
+  "short_name": "Pin High",
+  "description": "Rate South Africa's golf courses and 19th holes. Rankings decided by golfers, not panels.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0e2f21",
+  "theme_color": "#0e2f21",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

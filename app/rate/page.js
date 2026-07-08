@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import QuickRate from '../../components/QuickRate';
 
 export const metadata = {
@@ -19,7 +20,9 @@ export default function RatePage() {
         </div>
       </section>
       <div className="container">
-        <QuickRate />
+        <Suspense fallback={null}>
+          <QuickRate />
+        </Suspense>
       </div>
     </>
   );

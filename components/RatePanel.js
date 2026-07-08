@@ -32,6 +32,7 @@ export default function RatePanel({
   const [status, setStatus] = useState(null);
   const [saving, setSaving] = useState(false);
   const [missing, setMissing] = useState([]);
+  const [prefilled, setPrefilled] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -80,12 +81,22 @@ export default function RatePanel({
       return;
     }
     setSaving(false);
-    setStatus({
-      type: 'success',
-      msg: result.suspect
-        ? 'Thanks — your rating was recorded and is pending review.'
-        : 'Your rating is in. Thanks for shaping the list!',
-    });
+    let msg = result.suspect
+      ? 'Thanks — your rating was recorded and is pending review.'
+      : 'Your rating is in. Thanks for shaping the list!';
+    if (!result.suspect && kind === 'course') {
+      const { count } = await supabase
+        .from('ratings').select('id', { count: 'exact', head: true }).eq('user_id', user.id);
+      const milestones = [
+        [1, 'Opening Drive'], [9, 'Front Nine'], [18, 'Back Nine'],
+        [50, 'Halfway House'], [100, 'Century Club'], [250, 'Grand Tour'],
+      ];
+      const hit = milestones.find(([g]) => g === count);
+      const next = milestones.find(([g]) => g > (count || 0));
+      if (hit) msg = `Badge earned: ${hit[1]}! Your rating is in.`;
+      else if (next) msg = `Your rating is in — ${next[0] - count} more for the ${next[1]} badge.`;
+    }
+    setStatus({ type: 'success', msg });
     window.dispatchEvent(new Event('pinhigh:rated'));
     router.refresh();
   }
@@ -120,12 +131,23 @@ export default function RatePanel({
               <StarInput
                 value={form[key]}
                 onChange={(v) => {
-                  setForm((f) => ({ ...f, [key]: v }));
-                  setMissing((m) => m.filter((k) => k !== key));
+                  setForm((f) => {
+                    if (inputCats.every(({ key: k }) => !f[k])) {
+                      setPrefilled(true);
+                      return Object.fromEntries(inputCats.map(({ key: k }) => [k, v]));
+                    }
+                    return { ...f, [key]: v };
+                  });
+                  setMissing([]);
                 }}
               />
             </div>
           ))}
+          {prefilled && (
+            <p className="notice" style={{ marginTop: 4 }}>
+              We set every category to your first score — adjust any that differ.
+            </p>
+          )}
           {inputCats.every(({ key }) => form[key]) && (
             <div className="rate-row" style={{ borderTop: '1px solid var(--cream-dark)', paddingTop: 10 }}>
               <label style={{ fontWeight: 700 }}>Overall</label>
