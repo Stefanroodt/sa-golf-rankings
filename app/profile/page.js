@@ -34,6 +34,7 @@ export default function ProfilePage() {
   const [n19, setN19] = useState(0);
   const [dates19, setDates19] = useState([]);
   const [nPhotos, setNPhotos] = useState(0);
+  const [nFirsts, setNFirsts] = useState(0);
   const [provinceTotals, setProvinceTotals] = useState({});
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function ProfilePage() {
       const { data: u } = await supabase.auth.getUser();
       setUser(u.user);
       if (u.user) {
-        const [{ data: r }, { count }, { data: r19 }, { count: photos }, { data: allCourses }] =
+        const [{ data: r }, { count }, { data: r19 }, { count: photos }, { data: allCourses }, { count: firsts }] =
           await Promise.all([
             supabase
               .from('ratings')
@@ -52,12 +53,14 @@ export default function ProfilePage() {
             supabase.from('nineteenth_ratings').select('created_at').eq('user_id', u.user.id),
             supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
             supabase.from('courses').select('province'),
+            supabase.from('first_raters').select('course_id', { count: 'exact', head: true }).eq('user_id', u.user.id),
           ]);
         setRatings(r || []);
         setTotal(count);
         setN19((r19 || []).length);
         setDates19((r19 || []).map((x) => x.created_at));
         setNPhotos(photos || 0);
+        setNFirsts(firsts || 0);
         const totals = {};
         for (const c of allCourses || []) totals[c.province] = (totals[c.province] || 0) + 1;
         setProvinceTotals(totals);
@@ -85,7 +88,7 @@ export default function ProfilePage() {
     if (p) byProvince[p] = (byProvince[p] || 0) + 1;
   }
   const streak = computeStreak([...ratings.map((r) => r.created_at), ...dates19]);
-  const badges = computeBadges({ n, n19, nPhotos, byProvince, provinceTotals });
+  const badges = computeBadges({ n, n19, nPhotos, byProvince, provinceTotals, nFirsts });
   const earned = earnedBadges(badges);
 
   return (

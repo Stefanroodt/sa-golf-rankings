@@ -19,7 +19,7 @@ const db = () =>
 async function getGolfer(id) {
   try {
     const client = db();
-    const [{ data: ratings }, { data: r19 }, { count: nPhotos }, { data: allCourses }] =
+    const [{ data: ratings }, { data: r19 }, { count: nPhotos }, { data: allCourses }, { count: nFirsts }] =
       await Promise.all([
         client
           .from('ratings')
@@ -29,6 +29,7 @@ async function getGolfer(id) {
         client.from('nineteenth_ratings').select('id').eq('user_id', id).eq('suspect', false),
         client.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', id),
         client.from('courses').select('province'),
+        client.from('first_raters').select('course_id', { count: 'exact', head: true }).eq('user_id', id),
       ]);
     if (!ratings?.length && !r19?.length) return null;
 
@@ -44,6 +45,7 @@ async function getGolfer(id) {
       ratings: ratings || [],
       n19: (r19 || []).length,
       nPhotos: nPhotos || 0,
+      nFirsts: nFirsts || 0,
       byProvince,
       provinceTotals,
     };
@@ -66,7 +68,7 @@ export default async function GolferPage({ params }) {
   if (!g) notFound();
 
   const badges = computeBadges({
-    n: g.ratings.length, n19: g.n19, nPhotos: g.nPhotos,
+    n: g.ratings.length, n19: g.n19, nPhotos: g.nPhotos, nFirsts: g.nFirsts,
     byProvince: g.byProvince, provinceTotals: g.provinceTotals,
   });
   const earned = earnedBadges(badges);

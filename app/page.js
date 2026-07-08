@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import RankingsExplorer from '../components/RankingsExplorer';
 import PlayedProgress from '../components/PlayedProgress';
+import PrizeBanner from '../components/PrizeBanner';
 import FeedbackButton from '../components/FeedbackForm';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
@@ -31,6 +32,7 @@ export default async function Home() {
       </section>
 
       <div className="container">
+        <PrizeBanner />
         <PlayedProgress />
         <div className="province-links">
           {PROVINCES.map((p) => (

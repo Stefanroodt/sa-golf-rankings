@@ -24,12 +24,13 @@ const db = () =>
 async function getLeaderboard() {
   try {
     const client = db();
-    const [{ data: ratings }, { data: r19 }, { data: photos }, { data: allCourses }] =
+    const [{ data: ratings }, { data: r19 }, { data: photos }, { data: allCourses }, { data: firsts }] =
       await Promise.all([
         client.from('ratings').select('user_id, display_name, suspect, courses(province)'),
         client.from('nineteenth_ratings').select('user_id, suspect'),
         client.from('photos').select('user_id'),
         client.from('courses').select('province'),
+        client.from('first_raters').select('user_id'),
       ]);
 
     const provinceTotals = {};
@@ -37,7 +38,7 @@ async function getLeaderboard() {
 
     const users = {};
     const ensure = (id, name) => {
-      if (!users[id]) users[id] = { id, name: name || 'Golfer', n: 0, n19: 0, nPhotos: 0, byProvince: {} };
+      if (!users[id]) users[id] = { id, name: name || 'Golfer', n: 0, n19: 0, nPhotos: 0, nFirsts: 0, byProvince: {} };
       if (name) users[id].name = name;
       return users[id];
     };
@@ -53,6 +54,7 @@ async function getLeaderboard() {
       ensure(r.user_id).n19++;
     }
     for (const ph of photos || []) ensure(ph.user_id).nPhotos++;
+    for (const f of firsts || []) ensure(f.user_id).nFirsts++;
 
     return Object.values(users)
       .map((u) => {

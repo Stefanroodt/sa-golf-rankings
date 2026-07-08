@@ -64,6 +64,18 @@ a { color: inherit; text-decoration: none; }
   .hero-feedback, .hero-nineteenth { position: static; transform: none; margin-top: 14px; }
 }
 
+/* Prize banner */
+.prize-banner {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: var(--gold); color: var(--green-deep); border-radius: 12px;
+  padding: 12px 18px; margin: 18px 0 0; font-size: 14px; font-weight: 600;
+}
+.prize-banner:hover { background: #d9b23a; }
+.prize-banner-cta { white-space: nowrap; font-weight: 800; }
+@media (max-width: 640px) {
+  .prize-banner { flex-direction: column; text-align: center; gap: 4px; padding: 12px 14px; }
+}
+
 /* Quick rate */
 .rate-search {
   width: 100%; padding: 13px 14px; border: 1px solid var(--cream-dark);

@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import QuickRate from '../../components/QuickRate';
+import PrizeBanner from '../../components/PrizeBanner';
 
 export const metadata = {
   title: 'Rate a course | Pin High',
@@ -20,6 +21,7 @@ export default function RatePage() {
         </div>
       </section>
       <div className="container">
+        <PrizeBanner />
         <Suspense fallback={null}>
           <QuickRate />
         </Suspense>
