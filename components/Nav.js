@@ -48,6 +48,7 @@ export default function Nav() {
           <Link href="/">Rankings</Link>
           <Link href="/rate">Rate</Link>
           <Link href="/19th-holes">19th Holes</Link>
+          <Link href="/leaderboard">Leaderboard</Link>
           <Link href="/blog">Blog</Link>
           {user ? (
             <>
