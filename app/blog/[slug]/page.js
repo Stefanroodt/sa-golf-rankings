@@ -38,9 +38,6 @@ export default function Post({ params }) {
         <div className="container">
           <Link href="/blog" className="back-link">← All posts</Link>
           <h1>{post.title}</h1>
-          <div className="meta">
-            {new Date(post.date).toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </div>
         </div>
       </section>
       <div className="container">

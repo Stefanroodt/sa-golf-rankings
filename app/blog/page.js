@@ -22,10 +22,7 @@ export default function Blog() {
         {posts.map((p) => (
           <Link key={p.slug} href={`/blog/${p.slug}`} className="card blog-item">
             <h2>{p.title}</h2>
-            <p className="notice" style={{ margin: '6px 0 8px' }}>{p.excerpt}</p>
-            <span className="when">
-              {new Date(p.date).toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </span>
+            <p className="notice" style={{ margin: '6px 0 0' }}>{p.excerpt}</p>
           </Link>
         ))}
       </div>
