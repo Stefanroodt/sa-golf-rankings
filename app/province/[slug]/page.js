@@ -28,8 +28,21 @@ export default async function ProvincePage({ params }) {
   if (!province) notFound();
   const courses = await getRankings(province);
 
+  const listLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Best golf courses in ${province}, ranked by golfers`,
+    itemListElement: courses.slice(0, 20).map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      url: `https://pinhigh.co.za/course/${c.slug}`,
+    })),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd) }} />
       <section className="course-head">
         <div className="container">
           <Link href="/" className="back-link">← All of South Africa</Link>

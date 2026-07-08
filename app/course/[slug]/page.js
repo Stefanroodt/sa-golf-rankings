@@ -5,7 +5,7 @@ import ShareButtons from '../../../components/ShareButtons';
 import ReportButton from '../../../components/ReportButton';
 import PhotoUpload from '../../../components/PhotoUpload';
 import PhotoReportButton from '../../../components/PhotoReportButton';
-import { getCourse, getRatings, getPhotos, photoUrl } from '../../../lib/server';
+import { getCourse, getRatings, getPhotos, photoUrl, provinceSlug } from '../../../lib/server';
 import { CATEGORIES, CATEGORIES19 } from '../../../lib/supabase';
 
 export const revalidate = 0; // always fresh
@@ -69,18 +69,35 @@ export default async function CoursePage({ params }) {
     }),
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Rankings', item: 'https://pinhigh.co.za/' },
+      { '@type': 'ListItem', position: 2, name: course.province, item: `https://pinhigh.co.za/province/${provinceSlug(course.province)}` },
+      { '@type': 'ListItem', position: 3, name: course.name },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <section className="course-head">
         <div className="container">
           <Link href="/" className="back-link">← Back to rankings</Link>
           <h1>{course.name}</h1>
           <div className="meta">
-            {course.town}, {course.province}
+            {course.town},{' '}
+            <Link href={`/province/${provinceSlug(course.province)}`} style={{ textDecoration: 'underline' }}>
+              {course.province}
+            </Link>
             {course.designer ? ` · Designed by ${course.designer}` : ''} · {course.access}
             {course.holes ? ` · ${course.holes} holes` : ''}
           </div>

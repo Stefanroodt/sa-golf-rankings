@@ -1,0 +1,76 @@
+import Link from 'next/link';
+
+export const metadata = {
+  title: 'About Pin High — how the rankings work',
+  description:
+    'Pin High ranks all 413 GolfRSA-affiliated golf courses in South Africa using ratings from everyday golfers. Here\'s exactly how the rankings are calculated.',
+  alternates: { canonical: '/about' },
+};
+
+const FAQS = [
+  {
+    q: 'How are Pin High\'s golf course rankings decided?',
+    a: 'Entirely by golfers. Registered users rate courses they have played on six categories — overall, value, conditions, layout, clubhouse and staff — from 1 to 5 stars. Rankings are ordered by a weighted average of overall ratings, where courses with more ratings rank more reliably than courses with few. No panel, no editorial input, and no course can pay to move up.',
+  },
+  {
+    q: 'Which courses are included?',
+    a: 'All 413 GolfRSA-affiliated golf courses in South Africa, across all nine provinces — from championship estates to 9-hole country clubs. If a course is missing, use the feedback button on the homepage and we\'ll add it.',
+  },
+  {
+    q: 'Who can rate a course?',
+    a: 'Any golfer with a free account — sign up with Google, an email link, or an email and password in under a minute. Each golfer gets one rating per course, which they can update at any time. Ratings are screened automatically to stop anyone gaming the rankings with multiple accounts.',
+  },
+  {
+    q: 'What are the 19th hole rankings?',
+    a: 'A separate leaderboard for South Africa\'s clubhouse bars and halfway houses, rated on atmosphere, drinks, food, view and service. The 19th hole rankings are independent of course rankings — a modest course with a legendary bar can top the list.',
+  },
+  {
+    q: 'Does Pin High take money from golf courses?',
+    a: 'No. Pin High doesn\'t sell rankings, placements, or reviews. If a course tops a list, golfers put it there.',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQS.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
+
+export default function About() {
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <section className="course-head">
+        <div className="container">
+          <h1>About Pin High</h1>
+          <div className="meta">How the people&apos;s rankings work</div>
+        </div>
+      </section>
+      <div className="container">
+        <article className="post-body">
+          <p>
+            Pin High ranks every GolfRSA-affiliated golf course in South Africa —
+            all 413 of them — using ratings from golfers who have actually played
+            them. There is no panel and no editorial thumb on the scale: the
+            rankings are a live, weighted average of golfer ratings, and they
+            move whenever someone adds theirs.
+          </p>
+          {FAQS.map(({ q, a }) => (
+            <div key={q}>
+              <h2>{q}</h2>
+              <p>{a}</p>
+            </div>
+          ))}
+          <p style={{ marginTop: 28 }}>
+            <Link href="/" className="btn">See the rankings →</Link>{' '}
+            <Link href="/19th-holes" className="btn btn-gold" style={{ marginLeft: 8 }}>Best 19th holes →</Link>
+          </p>
+        </article>
+      </div>
+    </>
+  );
+}

@@ -271,6 +271,9 @@ footer {
   background: var(--green-deep); color: #9db8aa; text-align: center;
   padding: 22px 0; font-size: 13px; margin-top: auto;
 }
+.footer-links { display: flex; justify-content: center; gap: 18px; margin-bottom: 10px; }
+.footer-links a { color: var(--cream); font-size: 13px; }
+.footer-links a:hover { color: var(--gold); }
 .page { min-height: 100vh; display: flex; flex-direction: column; }
 .page > main { flex: 1; }
 
