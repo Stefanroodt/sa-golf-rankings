@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 const PAGE = 20;
 
@@ -34,6 +35,33 @@ export default function RankingsExplorer({ courses, provinces, hideProvinceFilte
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
   const topRef = useRef(null);
+  const pathname = usePathname();
+  const restored = useRef(false);
+
+  // Restore filters + page from the URL (so back-navigation lands where you were)
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get('prov')) setProvince(sp.get('prov'));
+    if (sp.get('holes')) setHoles(sp.get('holes'));
+    if (sp.get('sort')) setSort(sp.get('sort'));
+    if (sp.get('q')) setQuery(sp.get('q'));
+    const p = parseInt(sp.get('page') || '1', 10);
+    if (p > 1) setPage(p - 1);
+    restored.current = true;
+  }, []);
+
+  // Mirror state into the URL without triggering navigation
+  useEffect(() => {
+    if (!restored.current) return;
+    const sp = new URLSearchParams();
+    if (province !== 'All provinces') sp.set('prov', province);
+    if (holes !== 'All courses') sp.set('holes', holes);
+    if (sort !== 'Ranking') sp.set('sort', sort);
+    if (query) sp.set('q', query);
+    if (page > 0) sp.set('page', String(page + 1));
+    const qs = sp.toString();
+    window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname);
+  }, [province, holes, sort, query, page, pathname]);
 
   const goToPage = (p) => {
     setPage(p);
