@@ -171,7 +171,11 @@ export default function QuickRate() {
             </div>
           )}
 
-          <div className="two-col" style={{ marginTop: 18 }}>
+          <p className="notice" style={{ margin: '14px 0 0', textAlign: 'center' }}>
+            Two separate ratings: ⛳ the course (the golf) and 🍺 the 19th hole
+            (the bar afterwards). Do either — or both.
+          </p>
+          <div className="two-col" style={{ marginTop: 14 }}>
             <RatePanel course={selected} />
             <RatePanel
               course={selected}

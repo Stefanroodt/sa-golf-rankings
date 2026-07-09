@@ -156,6 +156,9 @@ export default async function CoursePage({ params }) {
                 ({ratings19.length} rating{ratings19.length === 1 ? '' : 's'})
               </span>
             </h2>
+            <p className="notice" style={{ marginTop: 0 }}>
+              The bar, not the golf — rated separately from the course.
+            </p>
             {ratings19.length === 0 && (
               <p className="notice">
                 How&apos;s the vibe after the round? Be the first to rate this 19th hole.

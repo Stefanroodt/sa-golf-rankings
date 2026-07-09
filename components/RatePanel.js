@@ -117,9 +117,18 @@ export default function RatePanel({
     router.refresh();
   }
 
+  const is19 = kind === 'nineteenth';
   return (
-    <div className="card">
-      <h2>{title}</h2>
+    <div className={`card${is19 ? ' card-nineteenth' : ''}`}>
+      <span className={`panel-tag${is19 ? ' panel-tag-19' : ''}`}>
+        {is19 ? '🍺 The bar' : '⛳ The golf'}
+      </span>
+      <h2 style={{ marginTop: 6 }}>{title}</h2>
+      <p className="notice" style={{ marginTop: 2 }}>
+        {is19
+          ? 'Separate from the course rating — this one is for the drinks, food and vibe after your round.'
+          : 'This rates the golf itself: value, conditions, layout, clubhouse facilities and staff.'}
+      </p>
       {user === undefined ? (
         <p className="notice">Checking sign-in…</p>
       ) : !user ? (
