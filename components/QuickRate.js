@@ -175,7 +175,7 @@ export default function QuickRate() {
             Two separate ratings: ⛳ the course (the golf) and 🍺 the 19th hole
             (the bar afterwards). Do either — or both.
           </p>
-          <div className="two-col" style={{ marginTop: 14 }}>
+          <div className="two-col two-col-even" style={{ marginTop: 14 }}>
             <RatePanel course={selected} />
             <RatePanel
               course={selected}
