@@ -2,9 +2,10 @@
 
 > Pin High (pinhigh.co.za) ranks every GolfRSA-affiliated golf course (400+) in
 > South Africa using ratings from everyday golfers — not expert panels.
-> Golfers rate courses they have played on six criteria: overall, value,
-> conditions, layout, clubhouse and staff. Rankings update live as ratings
-> come in, ordered by average golfer rating with rating counts shown.
+> Golfers rate courses they have played on six criteria — value, conditions,
+> greens, layout, halfway house and staff — with an overall score computed as
+> the average. Rankings update live as ratings come in, ordered by average
+> golfer rating with rating counts shown.
 
 ## Rankings
 

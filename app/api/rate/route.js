@@ -9,7 +9,7 @@ const ANON_KEY =
 const KINDS = {
   course: {
     table: 'ratings',
-    cats: ['overall', 'value', 'conditions', 'layout', 'clubhouse', 'staff'],
+    cats: ['overall', 'value', 'conditions', 'greens', 'layout', 'clubhouse', 'staff'],
   },
   nineteenth: {
     table: 'nineteenth_ratings',

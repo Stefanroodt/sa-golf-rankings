@@ -15,8 +15,9 @@ const METRIC_SETS = {
   course: {
     'Best value': 'avg_value',
     'Best conditions': 'avg_conditions',
+    'Best greens': 'avg_greens',
     'Best layout': 'avg_layout',
-    'Best clubhouse': 'avg_clubhouse',
+    'Best halfway house': 'avg_clubhouse',
     'Best staff': 'avg_staff',
   },
   nineteenth: {
