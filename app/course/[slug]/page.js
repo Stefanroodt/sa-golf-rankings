@@ -4,7 +4,7 @@ import RatePanel from '../../../components/RatePanel';
 import ShareButtons from '../../../components/ShareButtons';
 import ReportButton from '../../../components/ReportButton';
 import PhotoUpload from '../../../components/PhotoUpload';
-import PhotoReportButton from '../../../components/PhotoReportButton';
+import PhotoGallery from '../../../components/PhotoGallery';
 import { getCourse, getRatings, getPhotos, photoUrl, provinceSlug } from '../../../lib/server';
 import { CATEGORIES, CATEGORIES19 } from '../../../lib/supabase';
 
@@ -188,17 +188,10 @@ export default async function CoursePage({ params }) {
           {photos.length > 0 && (
             <div className="card">
               <h2>Photos</h2>
-              <div className="photo-grid">
-                {photos.map((p) => (
-                  <figure key={p.id}>
-                    <img src={photoUrl(p.path)} alt={`${course.name} — photo by ${p.display_name}`} loading="lazy" />
-                    <figcaption>
-                      {p.display_name}
-                      <PhotoReportButton photoId={p.id} />
-                    </figcaption>
-                  </figure>
-                ))}
-              </div>
+              <PhotoGallery
+                courseName={course.name}
+                photos={photos.map((p) => ({ ...p, url: photoUrl(p.path) }))}
+              />
             </div>
           )}
 

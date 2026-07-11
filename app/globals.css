@@ -274,6 +274,24 @@ textarea {
   display: flex; justify-content: space-between; align-items: center;
 }
 .photo-grid figcaption .report-link { margin-top: 0; }
+.photo-thumb { display: block; width: 100%; padding: 0; border: none; background: none; cursor: zoom-in; }
+
+/* Lightbox */
+.lightbox {
+  position: fixed; inset: 0; z-index: 300; background: rgba(8, 28, 19, .92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px; cursor: zoom-out;
+}
+.lightbox img {
+  max-width: 94vw; max-height: 84vh; border-radius: 10px; cursor: default;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+}
+.lightbox-caption { color: var(--cream); font-size: 13px; margin-top: 12px; }
+.lightbox-close {
+  position: absolute; top: 14px; right: 20px; background: none; border: none;
+  color: var(--cream); font-size: 38px; line-height: 1; cursor: pointer;
+}
+.lightbox-close:hover { color: var(--gold); }
 
 /* Tooltips */
 .tip {
