@@ -132,13 +132,11 @@ export default function ProfilePage() {
       </section>
       <div className="container" style={{ margin: '28px auto 60px' }}>
         <div className="card">
-          <h2>
-            Badges{' '}
-            <Link href="/leaderboard" style={{ fontSize: 13, fontWeight: 400, textDecoration: 'underline', color: 'var(--muted)' }}>
-              — see the leaderboard
-            </Link>
-          </h2>
+          <h2>Badges</h2>
           <BadgeGrid badges={badges} />
+          <p style={{ marginTop: 14 }}>
+            <Link href="/leaderboard" className="btn">View the badges leaderboard →</Link>
+          </p>
         </div>
 
         <div className="card" style={{ marginTop: 18 }}>

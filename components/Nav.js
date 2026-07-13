@@ -54,13 +54,9 @@ export default function Nav() {
           <FeedbackButton />
           {user ? (
             <>
-              {played && (
-                <Link href="/my-courses" className="played-pill" title="Your course card — rated and still to rate">
-                  ⛳ {played.mine}/{played.total}
-                </Link>
-              )}
-              <Link href="/profile" className="nav-user" style={{ opacity: 0.9 }}>
-                {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email}
+              <Link href="/profile" className="played-pill" title="Your profile — badges, ratings and photos">
+                ⛳ {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
+                {played ? ` · ${played.mine}/${played.total}` : ''}
               </Link>
               <a
                 href="#"
