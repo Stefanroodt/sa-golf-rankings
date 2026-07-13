@@ -6,13 +6,25 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 async function resizeImage(file, maxDim = 1600, quality = 0.82) {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    throw new Error(
+      'This photo format isn\'t supported by your browser (iPhone HEIC photos often aren\'t). Please convert it to JPEG or PNG and try again.'
+    );
+  }
+  if (!bitmap.width || !bitmap.height) throw new Error('Could not read this image — try a different photo.');
+  for (const dim of [maxDim, 1200, 800]) {
+    const scale = Math.min(1, dim / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+    if (blob && blob.size > 0 && blob.size < 4.5 * 1024 * 1024) return blob;
+  }
+  throw new Error('Could not process this image — try a smaller photo.');
 }
 
 export default function PhotoUpload({ courseId }) {
@@ -55,7 +67,8 @@ export default function PhotoUpload({ courseId }) {
       setStatus({ type: 'success', msg: 'Photo added — thanks!' });
       router.refresh();
     } catch (err) {
-      setStatus({ type: 'error', msg: err.message || 'Upload failed.' });
+      const detail = err?.message || err?.error || 'Upload failed.';
+      setStatus({ type: 'error', msg: `Upload failed: ${detail}` });
     }
     setBusy(false);
     if (fileRef.current) fileRef.current.value = '';
