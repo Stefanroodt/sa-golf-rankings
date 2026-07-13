@@ -36,6 +36,7 @@ export default function ProfilePage() {
   const [nPhotos, setNPhotos] = useState(0);
   const [nFirsts, setNFirsts] = useState(0);
   const [provinceTotals, setProvinceTotals] = useState({});
+  const [myPhotos, setMyPhotos] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -46,7 +47,7 @@ export default function ProfilePage() {
           await Promise.all([
             supabase
               .from('ratings')
-              .select('overall, comment, created_at, courses(name, slug, town, province)')
+              .select('overall, comment, created_at, course_id, courses(name, slug, town, province)')
               .eq('user_id', u.user.id)
               .order('created_at', { ascending: false }),
             supabase.from('courses').select('id', { count: 'exact', head: true }),
@@ -55,6 +56,11 @@ export default function ProfilePage() {
             supabase.from('courses').select('province'),
             supabase.from('first_raters').select('course_id', { count: 'exact', head: true }).eq('user_id', u.user.id),
           ]);
+        const { data: ph } = await supabase
+          .from('photos').select('id, path, course_id')
+          .eq('user_id', u.user.id).eq('hidden', false)
+          .order('created_at', { ascending: false });
+        setMyPhotos(ph || []);
         setRatings(r || []);
         setTotal(count);
         setN19((r19 || []).length);
@@ -90,6 +96,14 @@ export default function ProfilePage() {
   const streak = computeStreak([...ratings.map((r) => r.created_at), ...dates19]);
   const badges = computeBadges({ n, n19, nPhotos, byProvince, provinceTotals, nFirsts });
   const earned = earnedBadges(badges);
+
+  const PHOTO_BASE = 'https://mwotoycsaphyipbgyecn.supabase.co/storage/v1/object/public/course-photos/';
+  const photosByCourse = {};
+  for (const p of myPhotos) {
+    (photosByCourse[p.course_id] = photosByCourse[p.course_id] || []).push(p);
+  }
+  const ratedCourseIds = new Set(ratings.map((r) => r.course_id));
+  const unattachedPhotos = myPhotos.filter((p) => !ratedCourseIds.has(p.course_id));
 
   return (
     <>
@@ -147,9 +161,34 @@ export default function ProfilePage() {
                 </span>
               </span>
               {r.comment && <p>{r.comment}</p>}
+              {photosByCourse[r.course_id]?.length > 0 && (
+                <div className="mini-thumbs">
+                  {photosByCourse[r.course_id].map((p) => (
+                    <a key={p.id} href={PHOTO_BASE + p.path} target="_blank" rel="noopener noreferrer">
+                      <img src={PHOTO_BASE + p.path} alt="Your photo" loading="lazy" />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
+
+        {unattachedPhotos.length > 0 && (
+          <div className="card" style={{ marginTop: 18 }}>
+            <h2>Your other photos</h2>
+            <p className="notice" style={{ marginTop: 0 }}>
+              Uploaded at courses you haven&apos;t rated yet.
+            </p>
+            <div className="mini-thumbs">
+              {unattachedPhotos.map((p) => (
+                <a key={p.id} href={PHOTO_BASE + p.path} target="_blank" rel="noopener noreferrer">
+                  <img src={PHOTO_BASE + p.path} alt="Your photo" loading="lazy" />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

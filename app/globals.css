@@ -303,6 +303,13 @@ textarea {
 }
 .lightbox-close:hover { color: var(--gold); }
 
+/* Profile mini photo thumbs */
+.mini-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.mini-thumbs img {
+  width: 72px; height: 72px; object-fit: cover; border-radius: 6px;
+  display: block; background: var(--cream-dark);
+}
+
 /* Tooltips */
 .tip {
   position: relative; display: inline-block; margin-left: 6px;

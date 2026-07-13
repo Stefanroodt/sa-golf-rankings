@@ -39,39 +39,47 @@ export default function PhotoUpload({ courseId }) {
   }, []);
 
   async function handleFile(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []).filter((f) => f.type.startsWith('image/'));
+    if (!files.length) return;
     setStatus(null);
-    if (!file.type.startsWith('image/')) {
-      setStatus({ type: 'error', msg: 'Please choose an image file.' });
-      return;
-    }
     setBusy(true);
-    try {
-      const blob = await resizeImage(file);
-      const path = `${courseId}/${crypto.randomUUID()}.jpg`;
-      const { error: upErr } = await supabase.storage
-        .from('course-photos')
-        .upload(path, blob, { contentType: 'image/jpeg' });
-      if (upErr) throw upErr;
-      const { error: rowErr } = await supabase.from('photos').insert({
-        course_id: courseId,
-        user_id: user.id,
-        display_name:
-          user.user_metadata?.display_name ||
-          user.user_metadata?.full_name ||
-          user.email.split('@')[0],
-        path,
-      });
-      if (rowErr) throw rowErr;
-      setStatus({ type: 'success', msg: 'Photo added — thanks!' });
-      router.refresh();
-    } catch (err) {
-      const detail = err?.message || err?.error || 'Upload failed.';
-      setStatus({ type: 'error', msg: `Upload failed: ${detail}` });
+    let ok = 0;
+    let failMsg = null;
+    for (let i = 0; i < files.length; i++) {
+      setStatus({ type: 'success', msg: `Uploading ${i + 1} of ${files.length}…` });
+      try {
+        const blob = await resizeImage(files[i]);
+        if (!blob) throw new Error('could not process this image');
+        const path = `${courseId}/${crypto.randomUUID()}.jpg`;
+        const { error: upErr } = await supabase.storage
+          .from('course-photos')
+          .upload(path, blob, { contentType: 'image/jpeg' });
+        if (upErr) throw upErr;
+        const { error: rowErr } = await supabase.from('photos').insert({
+          course_id: courseId,
+          user_id: user.id,
+          display_name:
+            user.user_metadata?.display_name ||
+            user.user_metadata?.full_name ||
+            user.email.split('@')[0],
+          path,
+        });
+        if (rowErr) throw rowErr;
+        ok++;
+      } catch (err) {
+        failMsg = err?.message || err?.error || 'upload failed';
+      }
     }
     setBusy(false);
     if (fileRef.current) fileRef.current.value = '';
+    if (ok && !failMsg) {
+      setStatus({ type: 'success', msg: ok === 1 ? 'Photo added — thanks!' : `${ok} photos added — thanks!` });
+    } else if (ok && failMsg) {
+      setStatus({ type: 'success', msg: `${ok} added, some failed (${failMsg}).` });
+    } else {
+      setStatus({ type: 'error', msg: `Upload failed: ${failMsg}` });
+    }
+    if (ok) router.refresh();
   }
 
   return (
@@ -94,6 +102,7 @@ export default function PhotoUpload({ courseId }) {
             ref={fileRef}
             type="file"
             accept="image/*"
+            multiple
             onChange={handleFile}
             disabled={busy}
             style={{ fontSize: 13 }}
