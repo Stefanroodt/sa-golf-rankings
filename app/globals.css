@@ -49,8 +49,19 @@ a { color: inherit; text-decoration: none; }
   background: rgba(247,243,233,.12); border: 1px solid rgba(247,243,233,.25);
   color: var(--gold); font-size: 12px; font-weight: 700;
   padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+  font-family: inherit; cursor: pointer;
 }
 .played-pill:hover { background: rgba(247,243,233,.2); color: var(--gold); }
+
+.nav-user-wrap { position: relative; display: inline-block; }
+.nav-menu-backdrop { position: fixed; inset: 0; z-index: 90; }
+.nav-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 95;
+  display: flex; flex-direction: column; gap: 8px; min-width: 210px;
+  background: var(--card); border: 1px solid var(--cream-dark); border-radius: 12px;
+  padding: 10px; box-shadow: 0 8px 24px rgba(14,47,33,.2);
+}
+.nav-menu .chip { display: block; text-align: center; }
 .hero { position: relative; }
 .hero-feedback, .hero-nineteenth {
   position: absolute; top: 50%; transform: translateY(-50%);

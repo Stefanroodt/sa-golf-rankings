@@ -8,6 +8,7 @@ import FeedbackButton from './FeedbackForm';
 export default function Nav() {
   const [user, setUser] = useState(null);
   const [played, setPlayed] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -54,10 +55,30 @@ export default function Nav() {
           <FeedbackButton />
           {user ? (
             <>
-              <Link href="/profile" className="played-pill" title="Your profile — badges, ratings and photos">
-                ⛳ {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
-                {played ? ` · ${played.mine}/${played.total}` : ''}
-              </Link>
+              <span className="nav-user-wrap">
+                <button
+                  type="button"
+                  className="played-pill"
+                  onClick={() => setMenuOpen((o) => !o)}
+                  title="Your badges, ratings and courses"
+                >
+                  ⛳ {user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
+                  {played ? ` · ${played.mine}/${played.total}` : ''}
+                </button>
+                {menuOpen && (
+                  <>
+                    <span className="nav-menu-backdrop" onClick={() => setMenuOpen(false)} />
+                    <span className="nav-menu">
+                      <Link href="/profile" className="chip" onClick={() => setMenuOpen(false)}>
+                        🏅 Badges
+                      </Link>
+                      <Link href="/my-courses" className="chip" onClick={() => setMenuOpen(false)}>
+                        ⛳ My Ratings &amp; Courses
+                      </Link>
+                    </span>
+                  </>
+                )}
+              </span>
               <a
                 href="#"
                 onClick={async (e) => {
