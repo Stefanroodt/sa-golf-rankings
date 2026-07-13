@@ -52,6 +52,13 @@ export default function RatePanel({
   const [hasExisting, setHasExisting] = useState(false);
 
   useEffect(() => {
+    // Fresh course = fresh form; never carry stars over from the previous course
+    setForm(Object.fromEntries(inputCats.map((c) => [c.key, 0])));
+    setComment('');
+    setStatus(null);
+    setMissing([]);
+    setPrefilled(false);
+    setHasExisting(false);
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       setUser(u.user);
