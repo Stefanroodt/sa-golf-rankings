@@ -370,6 +370,13 @@ footer {
   background: var(--green-deep); color: #9db8aa; text-align: center;
   padding: 22px 0; font-size: 13px; margin-top: auto;
 }
+.install-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--gold); color: var(--green-deep); border: none;
+  font-size: 14px; font-weight: 700; padding: 11px 22px; border-radius: 24px;
+  cursor: pointer; font-family: inherit; margin-bottom: 16px;
+}
+.install-btn:hover { background: #d9b23a; }
 .footer-links { display: flex; justify-content: center; gap: 18px; margin-bottom: 10px; }
 .footer-links a { color: var(--cream); font-size: 13px; }
 .footer-links a:hover { color: var(--gold); }

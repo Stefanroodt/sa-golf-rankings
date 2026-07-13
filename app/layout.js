@@ -1,5 +1,6 @@
 import './globals.css';
 import Nav from '../components/Nav';
+import InstallApp from '../components/InstallApp';
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata = {
@@ -57,6 +58,7 @@ export default function RootLayout({ children }) {
           <Nav />
           <main>{children}</main>
           <footer>
+            <InstallApp />
             <div className="footer-links">
               <a href="/">Rankings</a>
               <a href="/19th-holes">19th Holes</a>
