@@ -15,7 +15,7 @@ export default function MyCourses() {
   const [courses, setCourses] = useState(null);
   const [mine, setMine] = useState({});
   const [province, setProvince] = useState('All provinces');
-  const [view, setView] = useState('unrated');
+  const [view, setView] = useState('all');
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -59,13 +59,19 @@ export default function MyCourses() {
     );
 
   const ratedTotal = Object.keys(mine).length;
-  const filtered = courses.filter(
-    (c) =>
-      (province === 'All provinces' || c.province === province) &&
-      (view === 'all' || (view === 'rated' ? mine[c.id] != null : mine[c.id] == null))
+  const inProvince = courses.filter(
+    (c) => province === 'All provinces' || c.province === province
   );
+  const ratedList = inProvince.filter((c) => mine[c.id] != null);
+  const unratedList = inProvince.filter((c) => mine[c.id] == null);
+  const filtered =
+    view === 'rated' ? ratedList
+    : view === 'unrated' ? unratedList
+    : [...ratedList, ...unratedList]; // rated first, still-to-rate underneath
   const pages = Math.ceil(filtered.length / PAGE);
   const shown = filtered.slice(page * PAGE, (page + 1) * PAGE);
+  const shownRated = shown.filter((c) => mine[c.id] != null);
+  const shownUnrated = shown.filter((c) => mine[c.id] == null);
 
   return (
     <>
@@ -108,29 +114,38 @@ export default function MyCourses() {
       </div>
 
       <div style={{ margin: '16px 0 48px' }}>
-        {shown.map((c) =>
-          mine[c.id] != null ? (
-            <Link key={c.id} href={`/course/${c.slug}`} className="search-result">
-              <span>
-                <strong>{c.name}</strong>
-                {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
-                <br />
-                <span className="meta-sub">{c.town}, {c.province}</span>
-              </span>
-              <span className="pick" style={{ color: 'var(--gold)' }}>★ {mine[c.id].toFixed(2)}</span>
-            </Link>
-          ) : (
-            <Link key={c.id} href={`/rate?course=${c.slug}`} className="search-result">
-              <span>
-                <strong>{c.name}</strong>
-                {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
-                <br />
-                <span className="meta-sub">{c.town}, {c.province}</span>
-              </span>
-              <span className="pick">Rate →</span>
-            </Link>
-          )
+        {shownRated.length > 0 && (
+          <p className="notice" style={{ margin: '4px 0 8px', fontWeight: 700 }}>
+            ★ Rated by me ({ratedList.length})
+          </p>
         )}
+        {shownRated.map((c) => (
+          <Link key={c.id} href={`/course/${c.slug}`} className="search-result">
+            <span>
+              <strong>{c.name}</strong>
+              {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
+              <br />
+              <span className="meta-sub">{c.town}, {c.province}</span>
+            </span>
+            <span className="pick" style={{ color: 'var(--gold)' }}>★ {mine[c.id].toFixed(2)}</span>
+          </Link>
+        ))}
+        {shownUnrated.length > 0 && (
+          <p className="notice" style={{ margin: '16px 0 8px', fontWeight: 700 }}>
+            Still to rate ({unratedList.length})
+          </p>
+        )}
+        {shownUnrated.map((c) => (
+          <Link key={c.id} href={`/rate?course=${c.slug}`} className="search-result">
+            <span>
+              <strong>{c.name}</strong>
+              {(c.holes ?? 18) < 18 && <span className="badge">{c.holes} holes</span>}
+              <br />
+              <span className="meta-sub">{c.town}, {c.province}</span>
+            </span>
+            <span className="pick">Rate →</span>
+          </Link>
+        ))}
         {filtered.length === 0 && (
           <p className="notice">
             {view === 'unrated'
