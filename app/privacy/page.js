@@ -23,8 +23,9 @@ export default function PrivacyPage() {
             community. This notice explains what personal information we
             collect, why, and your rights under the Protection of Personal
             Information Act, 4 of 2013 (POPIA). The responsible party is Pin
-            High, contactable via the feedback button on our homepage or at the
-            email address published on our social channels.
+            High, and the Information Officer can be contacted at{' '}
+            <strong>stefan@pinhigh.co.za</strong> or via the feedback button on
+            our homepage.
           </p>
 
           <h2>What we collect and why</h2>
@@ -76,8 +77,10 @@ export default function PrivacyPage() {
             Under POPIA you may ask us to confirm what personal information we
             hold about you, correct it, or delete it (including your whole
             account). You can update or delete your own ratings and photos on
-            the site at any time; for anything else, contact us via the
-            feedback button and we will respond within a reasonable time. If
+            the site at any time; for anything else, email{' '}
+            <strong>stefan@pinhigh.co.za</strong> and we will respond within a
+            reasonable time. Records can also be requested under PAIA — see our{' '}
+            <Link href="/paia" style={{ textDecoration: 'underline' }}>PAIA manual</Link>. If
             you believe we have mishandled your information, you may complain
             to the Information Regulator of South Africa
             (inforegulator.org.za).

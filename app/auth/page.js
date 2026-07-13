@@ -117,6 +117,10 @@ export default function AuthPage() {
             Or email me a sign-in link
           </button>
           {status && <p className={status.type}>{status.msg}</p>}
+          <p className="notice" style={{ marginTop: 10 }}>
+            By creating an account you accept our{' '}
+            <a href="/privacy" style={{ textDecoration: 'underline' }}>privacy policy</a>.
+          </p>
         </form>
       </div>
     </div>
