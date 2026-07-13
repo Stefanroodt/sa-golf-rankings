@@ -25,6 +25,10 @@ const FAQS = [
     a: 'A separate leaderboard for South Africa\'s clubhouse bars and halfway houses, rated on atmosphere, drinks, food, view and service. The 19th hole rankings are independent of course rankings — a modest course with a legendary bar can top the list.',
   },
   {
+    q: 'Is the Pin High app safe to install?',
+    a: 'Yes. Pin High installs as a web app — it is simply this website on your home screen, with no downloads from unknown sources, no access to your files, contacts or location, and nothing running in the background. On some Android phones the system shows a generic compatibility notice during installation ("built for an older version of Android"); that message comes from how Chrome packages all web apps and is safe to accept with Install anyway.',
+  },
+  {
     q: 'Does Pin High take money from golf courses?',
     a: 'No. Pin High doesn\'t sell rankings, placements, or reviews. If a course tops a list, golfers put it there.',
   },
