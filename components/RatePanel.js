@@ -49,6 +49,7 @@ export default function RatePanel({
   const [saving, setSaving] = useState(false);
   const [missing, setMissing] = useState([]);
   const [prefilled, setPrefilled] = useState(false);
+  const [hasExisting, setHasExisting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -61,6 +62,7 @@ export default function RatePanel({
         if (mine) {
           setForm(Object.fromEntries(inputCats.map(({ key }) => [key, Number(mine[key])])));
           setComment(mine.comment || '');
+          setHasExisting(true);
         }
       }
     })();
@@ -113,6 +115,26 @@ export default function RatePanel({
       else if (next) msg = `Your rating is in — ${next[0] - count} more for the ${next[1]} badge.`;
     }
     setStatus({ type: 'success', msg });
+    setHasExisting(true);
+    window.dispatchEvent(new Event('pinhigh:rated'));
+    router.refresh();
+  }
+
+  async function removeRating() {
+    if (!window.confirm(`Remove your ${kind === 'nineteenth' ? '19th hole' : 'course'} rating for ${course.name}? This can't be undone.`)) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from(table).delete()
+      .eq('course_id', course.id).eq('user_id', user.id);
+    setSaving(false);
+    if (error) {
+      setStatus({ type: 'error', msg: `Could not remove: ${error.message}` });
+      return;
+    }
+    setForm(empty);
+    setComment('');
+    setHasExisting(false);
+    setStatus({ type: 'success', msg: 'Rating removed.' });
     window.dispatchEvent(new Event('pinhigh:rated'));
     router.refresh();
   }
@@ -190,7 +212,17 @@ export default function RatePanel({
             value={comment} onChange={(e) => setComment(e.target.value)} maxLength={600}
           />
           <button className="btn" disabled={saving}>{saving ? 'Saving…' : 'Submit rating'}</button>
-          <p className="notice">One rating per golfer — submitting again updates yours.</p>
+          <p className="notice">
+            One rating per golfer — submitting again updates yours.
+            {hasExisting && (
+              <>
+                {' '}Rated the wrong course?{' '}
+                <button type="button" className="report-link" onClick={removeRating} disabled={saving}>
+                  Remove my rating
+                </button>
+              </>
+            )}
+          </p>
           {status && <p className={status.type}>{status.msg}</p>}
         </form>
       )}
