@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-export default function InstallApp() {
+export default function InstallApp({ className = 'install-btn', label = '📲 Get the Pin High app' }) {
   const [deferred, setDeferred] = useState(null);
   const [show, setShow] = useState(false);
   const [isIos, setIsIos] = useState(false);
@@ -45,8 +45,8 @@ export default function InstallApp() {
 
   return (
     <>
-      <button className="install-btn" onClick={install}>
-        📲 Get the Pin High app
+      <button className={className} onClick={install}>
+        {label}
       </button>
       {help && (
         <div className="modal-overlay" onClick={() => setHelp(false)}>

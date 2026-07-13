@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import FeedbackButton from './FeedbackForm';
 
 export default function Nav() {
   const [user, setUser] = useState(null);
@@ -50,6 +51,7 @@ export default function Nav() {
           <Link href="/19th-holes">19th Holes</Link>
           <Link href="/leaderboard">Leaderboard</Link>
           <Link href="/blog">Blog</Link>
+          <FeedbackButton />
           {user ? (
             <>
               {played && (

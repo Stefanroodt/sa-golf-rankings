@@ -32,8 +32,8 @@ export default function FeedbackButton() {
 
   return (
     <>
-      <button className="hero-feedback" onClick={() => setOpen(true)}>
-        Give feedback
+      <button className="nav-feedback" onClick={() => setOpen(true)}>
+        Feedback
       </button>
       {open && (
         <div className="modal-overlay" onClick={() => setOpen(false)}>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import RankingsExplorer from '../components/RankingsExplorer';
 import PlayedProgress from '../components/PlayedProgress';
 import PrizeBanner from '../components/PrizeBanner';
-import FeedbackButton from '../components/FeedbackForm';
+import InstallApp from '../components/InstallApp';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
 export const revalidate = 60;
@@ -24,7 +24,7 @@ export default async function Home() {
             favourites? Rate them and have your say.
           </p>
           <Link href="/rate" className="hero-rate">Rate a course now ★</Link>
-          <FeedbackButton />
+          <InstallApp className="hero-feedback" label="📲 Get the app" />
           <Link href="/19th-holes" className="hero-nineteenth">
             Best 19th Holes ⛳
           </Link>
