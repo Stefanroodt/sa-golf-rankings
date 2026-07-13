@@ -55,7 +55,7 @@ export default function Nav() {
           {user ? (
             <>
               {played && (
-                <Link href="/profile" className="played-pill" title="Courses you've played & rated">
+                <Link href="/my-courses" className="played-pill" title="Your course card — rated and still to rate">
                   ⛳ {played.mine}/{played.total}
                 </Link>
               )}

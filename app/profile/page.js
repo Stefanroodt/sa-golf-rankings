@@ -109,6 +109,11 @@ export default function ProfilePage() {
               />
             </div>
           )}
+          <p style={{ marginTop: 10 }}>
+            <Link href="/my-courses" style={{ color: 'var(--gold)', textDecoration: 'underline', fontSize: 14 }}>
+              See your full course card — rated and still to rate →
+            </Link>
+          </p>
         </div>
       </section>
       <div className="container" style={{ margin: '28px auto 60px' }}>

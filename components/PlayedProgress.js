@@ -25,7 +25,7 @@ export default function PlayedProgress() {
   if (!stats) return null;
 
   return (
-    <Link href="/profile" className="played-progress">
+    <Link href="/my-courses" className="played-progress">
       <span className="played-progress-label">
         {stats.mine}/{stats.total} courses rated and played
       </span>
