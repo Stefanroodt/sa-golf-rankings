@@ -107,10 +107,9 @@ export default function BragCard({ name, rated, total, badgeCount, badgeNames = 
 
       const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
       const file = new File([blob], 'pinhigh-card.png', { type: 'image/png' });
-      const text = `I've rated ${rated} of ${total} SA golf courses on Pin High ⛳ What's your number? pinhigh.co.za`;
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], text });
+        await navigator.share({ files: [file] });
         setNote('Shared!');
       } else {
         const url = URL.createObjectURL(blob);
