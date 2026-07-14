@@ -16,6 +16,7 @@ export default function MyCourses() {
   const [mine, setMine] = useState({});
   const [province, setProvince] = useState('All provinces');
   const [view, setView] = useState('all');
+  const [sortBy, setSortBy] = useState('A–Z');
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -62,7 +63,12 @@ export default function MyCourses() {
   const inProvince = courses.filter(
     (c) => province === 'All provinces' || c.province === province
   );
-  const ratedList = inProvince.filter((c) => mine[c.id] != null);
+  const ratedSorters = {
+    'A–Z': (a, b) => a.name.localeCompare(b.name),
+    'My highest first': (a, b) => mine[b.id] - mine[a.id] || a.name.localeCompare(b.name),
+    'My lowest first': (a, b) => mine[a.id] - mine[b.id] || a.name.localeCompare(b.name),
+  };
+  const ratedList = inProvince.filter((c) => mine[c.id] != null).sort(ratedSorters[sortBy]);
   const unratedList = inProvince.filter((c) => mine[c.id] == null);
   const filtered =
     view === 'rated' ? ratedList
@@ -99,7 +105,7 @@ export default function MyCourses() {
             );
           })}
         </div>
-        <div className="chip-row" style={{ marginTop: 10 }}>
+        <div className="chip-row" style={{ marginTop: 10, alignItems: 'center' }}>
           {[['unrated', 'Still to rate'], ['rated', 'Rated by me'], ['all', 'Everything']].map(([v, label]) => (
             <button
               key={v}
@@ -110,6 +116,13 @@ export default function MyCourses() {
               {label}
             </button>
           ))}
+          <select
+            value={sortBy}
+            onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+            style={{ padding: '7px 10px', border: '1px solid var(--cream-dark)', borderRadius: 20, fontSize: 13, background: '#fff', color: 'var(--ink)', marginLeft: 'auto' }}
+          >
+            {Object.keys(ratedSorters).map((s) => <option key={s}>{s}</option>)}
+          </select>
         </div>
       </div>
 

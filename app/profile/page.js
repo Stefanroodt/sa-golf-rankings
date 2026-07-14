@@ -37,6 +37,7 @@ export default function ProfilePage() {
   const [nFirsts, setNFirsts] = useState(0);
   const [provinceTotals, setProvinceTotals] = useState({});
   const [myPhotos, setMyPhotos] = useState([]);
+  const [sortBy, setSortBy] = useState('Newest first');
 
   useEffect(() => {
     (async () => {
@@ -105,6 +106,14 @@ export default function ProfilePage() {
   const ratedCourseIds = new Set(ratings.map((r) => r.course_id));
   const unattachedPhotos = myPhotos.filter((p) => !ratedCourseIds.has(p.course_id));
 
+  const sorters = {
+    'Newest first': (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    'Highest rated': (a, b) => Number(b.overall) - Number(a.overall) || a.courses.name.localeCompare(b.courses.name),
+    'Lowest rated': (a, b) => Number(a.overall) - Number(b.overall) || a.courses.name.localeCompare(b.courses.name),
+    'A–Z': (a, b) => a.courses.name.localeCompare(b.courses.name),
+  };
+  const sortedRatings = [...ratings].sort(sorters[sortBy]);
+
   return (
     <>
       <section className="course-head">
@@ -140,14 +149,23 @@ export default function ProfilePage() {
         </div>
 
         <div className="card" style={{ marginTop: 18 }}>
-          <h2>Your ratings</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <h2 style={{ marginBottom: 0 }}>Your ratings</h2>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{ padding: '7px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 13, background: '#fff', color: 'var(--ink)' }}
+            >
+              {Object.keys(sorters).map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </div>
           {ratings.length === 0 && (
             <p className="notice">
               Nothing yet — find a course you&apos;ve played on the{' '}
               <Link href="/rate" style={{ textDecoration: 'underline' }}>rate page</Link> and get your first badge.
             </p>
           )}
-          {ratings.map((r, i) => (
+          {sortedRatings.map((r, i) => (
             <div className="review" key={i}>
               <span className="who">
                 <Link href={`/course/${r.courses.slug}`} style={{ textDecoration: 'underline' }}>
