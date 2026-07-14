@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 function rr(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -16,9 +16,11 @@ const F = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 
 export default function BragCard({ name, rated, total, badgeCount, badgeNames = [], bestCourse }) {
   const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState(null);
   const [note, setNote] = useState(null);
+  const blobRef = useRef(null);
 
-  async function share() {
+  async function makeCard() {
     setBusy(true);
     setNote(null);
     try {
@@ -64,7 +66,7 @@ export default function BragCard({ name, rated, total, badgeCount, badgeNames = 
       if (badgeCount > 0) {
         x.fillStyle = '#cfe0d5';
         x.font = `bold 40px ${F}`;
-        x.fillText(`🏅 ${badgeCount} badge${badgeCount === 1 ? '' : 's'} earned`, W / 2, 990);
+        x.fillText(`★ ${badgeCount} badge${badgeCount === 1 ? '' : 's'} earned`, W / 2, 990);
 
         const pills = badgeNames.slice(0, 3);
         x.font = `bold 34px ${F}`;
@@ -106,31 +108,69 @@ export default function BragCard({ name, rated, total, badgeCount, badgeNames = 
       x.fillText('Golf courses, ranked by golfers — not panels', W / 2, 1725);
 
       const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
-      const file = new File([blob], 'pinhigh-card.png', { type: 'image/png' });
-
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        setNote('Shared!');
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'pinhigh-card.png';
-        a.click();
-        setNote('Card downloaded — post it anywhere.');
-      }
-    } catch (e) {
-      if (e?.name !== 'AbortError') setNote('Could not create the card — try again.');
+      if (!blob) throw new Error('no blob');
+      blobRef.current = blob;
+      setPreview(URL.createObjectURL(blob));
+    } catch {
+      setNote('Could not create the card — try again.');
     }
     setBusy(false);
   }
 
+  async function shareCard() {
+    const blob = blobRef.current;
+    if (!blob) return;
+    const file = new File([blob], 'pinhigh-card.png', { type: 'image/png' });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file] });
+        setPreview(null);
+      } else {
+        saveCard();
+      }
+    } catch (e) {
+      if (e?.name !== 'AbortError') setNote('Sharing failed — use Save instead.');
+    }
+  }
+
+  function saveCard() {
+    const blob = blobRef.current;
+    if (!blob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'pinhigh-card.png';
+    a.click();
+    setNote('Saved — post it anywhere.');
+  }
+
   return (
     <span>
-      <button className="btn btn-gold" onClick={share} disabled={busy} style={{ marginTop: 12 }}>
+      <button className="btn btn-gold" onClick={makeCard} disabled={busy} style={{ marginTop: 12 }}>
         {busy ? 'Creating…' : '📲 Share my card'}
       </button>
-      {note && <span className="notice" style={{ marginLeft: 10 }}>{note}</span>}
+      {note && !preview && <span className="notice" style={{ marginLeft: 10 }}>{note}</span>}
+
+      {preview && (
+        <span className="modal-overlay" onClick={() => setPreview(null)} style={{ alignItems: 'center' }}>
+          <span
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: 340, textAlign: 'center', display: 'block' }}
+          >
+            <button className="modal-close" onClick={() => setPreview(null)} aria-label="Close">×</button>
+            <img
+              src={preview}
+              alt="Your Pin High card"
+              style={{ width: '100%', maxHeight: '60vh', objectFit: 'contain', borderRadius: 10 }}
+            />
+            <span style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
+              <button className="btn btn-gold" onClick={shareCard}>Share</button>
+              <button className="btn" onClick={saveCard}>Save image</button>
+            </span>
+            {note && <p className="notice" style={{ marginTop: 8 }}>{note}</p>}
+          </span>
+        </span>
+      )}
     </span>
   );
 }
