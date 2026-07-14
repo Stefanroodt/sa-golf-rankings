@@ -133,6 +133,19 @@ export default function BragCard({ name, rated, total, badgeCount, badgeNames = 
     }
   }
 
+  async function copyCard() {
+    const blob = blobRef.current;
+    if (!blob) return;
+    try {
+      // Safari requires the blob wrapped in a promise inside the user gesture
+      const item = new ClipboardItem({ 'image/png': Promise.resolve(blob) });
+      await navigator.clipboard.write([item]);
+      setNote('Copied — paste it into any chat.');
+    } catch {
+      setNote('Copying images isn’t supported on this phone — use Share or Save instead.');
+    }
+  }
+
   function saveCard() {
     const blob = blobRef.current;
     if (!blob) return;
@@ -163,8 +176,11 @@ export default function BragCard({ name, rated, total, badgeCount, badgeNames = 
               alt="Your Pin High card"
               style={{ width: '100%', maxHeight: '60vh', objectFit: 'contain', borderRadius: 10 }}
             />
-            <span style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
+            <span style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12, flexWrap: 'wrap' }}>
               <button className="btn btn-gold" onClick={shareCard}>Share</button>
+              {typeof window !== 'undefined' && window.ClipboardItem && navigator.clipboard?.write && (
+                <button className="btn" onClick={copyCard}>Copy</button>
+              )}
               <button className="btn" onClick={saveCard}>Save image</button>
             </span>
             {note && <p className="notice" style={{ marginTop: 8 }}>{note}</p>}
