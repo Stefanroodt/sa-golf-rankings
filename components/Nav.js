@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import FeedbackButton from './FeedbackForm';
@@ -9,6 +10,16 @@ export default function Nav() {
   const [user, setUser] = useState(null);
   const [played, setPlayed] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Count in-app navigations so course pages know whether "Back" has
+  // somewhere sensible to return to.
+  useEffect(() => {
+    try {
+      const n = Number(sessionStorage.getItem('ph-nav') || 0) + 1;
+      sessionStorage.setItem('ph-nav', String(n));
+    } catch {}
+  }, [pathname]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));

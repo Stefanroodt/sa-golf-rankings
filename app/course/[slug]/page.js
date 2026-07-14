@@ -5,6 +5,7 @@ import ShareButtons from '../../../components/ShareButtons';
 import ReportButton from '../../../components/ReportButton';
 import PhotoUpload from '../../../components/PhotoUpload';
 import PhotoGallery from '../../../components/PhotoGallery';
+import BackLink from '../../../components/BackLink';
 import { getCourse, getRatings, getPhotos, photoUrl, provinceSlug } from '../../../lib/server';
 import { CATEGORIES, CATEGORIES19 } from '../../../lib/supabase';
 
@@ -91,7 +92,7 @@ export default async function CoursePage({ params }) {
       />
       <section className="course-head">
         <div className="container">
-          <Link href="/" className="back-link">← Back to rankings</Link>
+          <BackLink />
           <h1>{course.name}</h1>
           <div className="meta">
             {course.town},{' '}
