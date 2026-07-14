@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { computeBadges, earnedBadges } from '../lib/badges';
+import BragCard from './BragCard';
 
 const PROVINCES = [
   'All provinces', 'Western Cape', 'Eastern Cape', 'KwaZulu-Natal', 'Gauteng',
@@ -18,6 +20,7 @@ export default function MyCourses() {
   const [view, setView] = useState('all');
   const [sortBy, setSortBy] = useState('A–Z');
   const [page, setPage] = useState(0);
+  const [extras, setExtras] = useState({ n19: 0, nPhotos: 0, nFirsts: 0 });
 
   useEffect(() => {
     (async () => {
@@ -32,6 +35,12 @@ export default function MyCourses() {
       const m = {};
       for (const r of rs || []) m[r.course_id] = Number(r.overall);
       setMine(m);
+      const [{ count: n19 }, { count: nPhotos }, { count: nFirsts }] = await Promise.all([
+        supabase.from('nineteenth_ratings').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
+        supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
+        supabase.from('first_raters').select('course_id', { count: 'exact', head: true }).eq('user_id', u.user.id),
+      ]);
+      setExtras({ n19: n19 || 0, nPhotos: nPhotos || 0, nFirsts: nFirsts || 0 });
     })();
   }, []);
 
@@ -60,6 +69,23 @@ export default function MyCourses() {
     );
 
   const ratedTotal = Object.keys(mine).length;
+
+  const byProvince = {};
+  const provTotals = {};
+  let best = null;
+  for (const c of courses) {
+    provTotals[c.province] = (provTotals[c.province] || 0) + 1;
+    if (mine[c.id] != null) {
+      byProvince[c.province] = (byProvince[c.province] || 0) + 1;
+      if (!best || mine[c.id] > best.overall) best = { name: c.name, overall: mine[c.id] };
+    }
+  }
+  const earned = earnedBadges(
+    computeBadges({
+      n: ratedTotal, n19: extras.n19, nPhotos: extras.nPhotos, nFirsts: extras.nFirsts,
+      byProvince, provinceTotals: provTotals,
+    })
+  );
   const inProvince = courses.filter(
     (c) => province === 'All provinces' || c.province === province
   );
@@ -88,6 +114,14 @@ export default function MyCourses() {
         <div className="progress-track on-light">
           <div className="progress-fill" style={{ width: `${Math.min(100, (ratedTotal / courses.length) * 100)}%` }} />
         </div>
+        <BragCard
+          name={user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
+          rated={ratedTotal}
+          total={courses.length}
+          badgeCount={earned.length}
+          badgeNames={[...earned].sort((a, b) => b.goal - a.goal).map((b) => b.name)}
+          bestCourse={best}
+        />
         <div className="chip-row" style={{ marginTop: 14 }}>
           {PROVINCES.map((p) => {
             const c = p === 'All provinces'
