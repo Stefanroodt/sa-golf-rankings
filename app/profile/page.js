@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { computeBadges, earnedBadges } from '../../lib/badges';
 import BadgeGrid from '../../components/BadgeGrid';
+import BragCard from '../../components/BragCard';
 
 function weekKey(d) {
   const date = new Date(d);
@@ -137,6 +138,21 @@ export default function ProfilePage() {
               See your full course card — rated and still to rate →
             </Link>
           </p>
+          <BragCard
+            name={user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
+            rated={n}
+            total={total || 0}
+            badgeCount={earned.length}
+            badgeNames={[...earned].sort((a, b) => b.goal - a.goal).map((b) => b.name)}
+            bestCourse={
+              ratings.length
+                ? [...ratings].sort((a, b) => Number(b.overall) - Number(a.overall))[0] && {
+                    name: [...ratings].sort((a, b) => Number(b.overall) - Number(a.overall))[0].courses.name,
+                    overall: [...ratings].sort((a, b) => Number(b.overall) - Number(a.overall))[0].overall,
+                  }
+                : null
+            }
+          />
         </div>
       </section>
       <div className="container" style={{ margin: '28px auto 60px' }}>
