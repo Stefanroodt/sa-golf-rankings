@@ -122,7 +122,8 @@ export default function ProfilePage() {
         <div className="container">
           <h1>{user.user_metadata?.display_name || user.user_metadata?.full_name || user.email}</h1>
           <div className="meta">
-            {n} course{n === 1 ? '' : 's'} played &amp; rated{total ? ` of ${total}` : ''} ·{' '}
+            {nSA} course{nSA === 1 ? '' : 's'} played &amp; rated{total ? ` of ${total}` : ''}
+            {n - nSA > 0 ? ` · 🏝️ ${n - nSA}/${provinceTotals['Mauritius'] || 16} in Mauritius` : ''} ·{' '}
             {earned.length} badge{earned.length === 1 ? '' : 's'}
             {streak > 1 ? ` · ${streak}-week rating streak` : ''}
           </div>
