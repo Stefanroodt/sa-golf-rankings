@@ -8,7 +8,7 @@ import BragCard from './BragCard';
 
 const PROVINCES = [
   'All provinces', 'Western Cape', 'Eastern Cape', 'KwaZulu-Natal', 'Gauteng',
-  'Mpumalanga', 'Limpopo', 'North West', 'Free State', 'Northern Cape',
+  'Mpumalanga', 'Limpopo', 'North West', 'Free State', 'Northern Cape', 'Mauritius',
 ];
 const PAGE = 30;
 
@@ -28,7 +28,7 @@ export default function MyCourses() {
       setUser(u.user);
       if (!u.user) return;
       const [{ data: cs }, { data: rs }] = await Promise.all([
-        supabase.from('courses').select('id, slug, name, town, province, holes').order('name'),
+        supabase.from('courses').select('id, slug, name, town, province, country, holes').order('name'),
         supabase.from('ratings').select('course_id, overall').eq('user_id', u.user.id),
       ]);
       setCourses(cs || []);
@@ -68,27 +68,33 @@ export default function MyCourses() {
       </div>
     );
 
-  const ratedTotal = Object.keys(mine).length;
+  const allRated = Object.keys(mine).length;
+  const saCourses = courses.filter((c) => c.country !== 'Mauritius');
+  const ratedTotal = saCourses.filter((c) => mine[c.id] != null).length; // SA number — the identity
+  const muTotal = courses.length - saCourses.length;
+  const muRated = allRated - ratedTotal;
 
   const byProvince = {};
   const provTotals = {};
-  let best = null;
+  let best = null; // best SA course — the brag card is an SA card
   for (const c of courses) {
     provTotals[c.province] = (provTotals[c.province] || 0) + 1;
     if (mine[c.id] != null) {
       byProvince[c.province] = (byProvince[c.province] || 0) + 1;
-      if (!best || mine[c.id] > best.overall) best = { name: c.name, overall: mine[c.id] };
+      if (c.country !== 'Mauritius' && (!best || mine[c.id] > best.overall))
+        best = { name: c.name, overall: mine[c.id] };
     }
   }
   const earned = earnedBadges(
     computeBadges({
-      n: ratedTotal, n19: extras.n19, nPhotos: extras.nPhotos, nFirsts: extras.nFirsts,
+      n: allRated, n19: extras.n19, nPhotos: extras.nPhotos, nFirsts: extras.nFirsts,
       byProvince, provinceTotals: provTotals,
     })
   );
-  const inProvince = courses.filter(
-    (c) => province === 'All provinces' || c.province === province
-  );
+  const inProvince =
+    province === 'All provinces'
+      ? saCourses
+      : courses.filter((c) => c.province === province);
   const ratedSorters = {
     'A–Z': (a, b) => a.name.localeCompare(b.name),
     'My highest first': (a, b) => mine[b.id] - mine[a.id] || a.name.localeCompare(b.name),
@@ -109,15 +115,20 @@ export default function MyCourses() {
     <>
       <div className="card" style={{ marginTop: 20 }}>
         <h2>
-          {ratedTotal}/{courses.length} courses rated and played
+          {ratedTotal}/{saCourses.length} courses rated and played
         </h2>
         <div className="progress-track on-light">
-          <div className="progress-fill" style={{ width: `${Math.min(100, (ratedTotal / courses.length) * 100)}%` }} />
+          <div className="progress-fill" style={{ width: `${Math.min(100, (ratedTotal / saCourses.length) * 100)}%` }} />
         </div>
+        {muRated > 0 && (
+          <p className="notice" style={{ margin: '6px 0 0' }}>
+            🏝️ Plus {muRated}/{muTotal} in Mauritius
+          </p>
+        )}
         <BragCard
           name={user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
           rated={ratedTotal}
-          total={courses.length}
+          total={saCourses.length}
           badgeCount={earned.length}
           badgeNames={[...earned].sort((a, b) => b.goal - a.goal).map((b) => b.name)}
           bestCourse={best}
@@ -125,7 +136,7 @@ export default function MyCourses() {
         <div className="chip-row" style={{ marginTop: 14 }}>
           {PROVINCES.map((p) => {
             const c = p === 'All provinces'
-              ? { rated: ratedTotal, total: courses.length }
+              ? { rated: ratedTotal, total: saCourses.length }
               : provinceCounts[p] || { rated: 0, total: 0 };
             return (
               <button
@@ -134,7 +145,7 @@ export default function MyCourses() {
                 style={province === p ? { background: 'var(--green-mid)', color: 'var(--cream)' } : undefined}
                 onClick={() => { setProvince(p); setPage(0); }}
               >
-                {p === 'All provinces' ? 'All' : p} {c.rated}/{c.total}
+                {p === 'All provinces' ? 'All SA' : p === 'Mauritius' ? '🏝️ Mauritius' : p} {c.rated}/{c.total}
               </button>
             );
           })}

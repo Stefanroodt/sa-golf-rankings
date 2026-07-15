@@ -8,9 +8,13 @@
 > the average. Rankings update live as ratings come in, ordered by average
 > golfer rating with rating counts shown.
 
+Pin High also covers all golf courses in Mauritius — a favourite destination
+for South African golfers — ranked separately from the SA national rankings.
+
 ## Rankings
 
 - [National rankings](https://pinhigh.co.za/): all South African courses ranked by golfer ratings
+- [Mauritius rankings](https://pinhigh.co.za/province/mauritius): all Mauritius courses ranked by golfer ratings
 - [Western Cape](https://pinhigh.co.za/province/western-cape)
 - [Eastern Cape](https://pinhigh.co.za/province/eastern-cape)
 - [KwaZulu-Natal](https://pinhigh.co.za/province/kwazulu-natal)

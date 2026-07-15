@@ -38,6 +38,7 @@ export default async function Home() {
           {PROVINCES.map((p) => (
             <Link key={p} href={`/province/${provinceSlug(p)}`}>{p}</Link>
           ))}
+          <Link href="/province/mauritius">Mauritius 🏝️</Link>
         </div>
 
         <RankingsExplorer courses={courses} provinces={PROVINCES} />

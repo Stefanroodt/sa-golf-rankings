@@ -1,4 +1,4 @@
-import { getAllSlugs, PROVINCES, provinceSlug } from '../lib/server';
+import { getAllSlugs, REGIONS, provinceSlug } from '../lib/server';
 import { POSTS } from '../lib/posts';
 
 const BASE = 'https://pinhigh.co.za';
@@ -20,7 +20,7 @@ export default async function sitemap() {
       changeFrequency: 'monthly',
       priority: 0.6,
     })),
-    ...PROVINCES.map((p) => ({
+    ...REGIONS.map((p) => ({
       url: `${BASE}/province/${provinceSlug(p)}`,
       changeFrequency: 'daily',
       priority: 0.8,

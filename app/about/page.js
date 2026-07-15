@@ -17,6 +17,10 @@ const FAQS = [
     a: 'Every GolfRSA-affiliated golf course in South Africa — more than 400 — across all nine provinces — from championship estates to 9-hole country clubs. If a course is missing, use the feedback button on the homepage and we\'ll add it.',
   },
   {
+    q: 'Does Pin High cover courses outside South Africa?',
+    a: 'Yes — Mauritius, the favourite golf trip for South African golfers. All of the island\'s courses are on the site and can be rated exactly like SA courses, with their own rankings page. Mauritius courses never mix into the South African national rankings, and your SA courses-played number stays a purely South African count.',
+  },
+  {
     q: 'Who can rate a course?',
     a: 'Any golfer with a free account — sign up with Google, an email link, or an email and password in under a minute. Each golfer gets one rating per course, which they can update at any time. Ratings are screened automatically to stop anyone gaming the rankings with multiple accounts.',
   },

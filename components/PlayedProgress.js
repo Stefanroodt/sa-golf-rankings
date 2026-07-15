@@ -12,8 +12,12 @@ export default function PlayedProgress() {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return;
       const [{ count: mine }, { count: total }] = await Promise.all([
-        supabase.from('ratings').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
-        supabase.from('courses').select('id', { count: 'exact', head: true }),
+        supabase
+          .from('ratings')
+          .select('id, courses!inner(id)', { count: 'exact', head: true })
+          .eq('user_id', u.user.id)
+          .eq('courses.country', 'South Africa'),
+        supabase.from('courses').select('id', { count: 'exact', head: true }).eq('country', 'South Africa'),
       ]);
       if (mine !== null && total) setStats({ mine, total });
     };

@@ -8,7 +8,7 @@ import RatePanel from './RatePanel';
 
 const PROVINCES = [
   'All provinces', 'Western Cape', 'Eastern Cape', 'KwaZulu-Natal', 'Gauteng',
-  'Mpumalanga', 'Limpopo', 'North West', 'Free State', 'Northern Cape',
+  'Mpumalanga', 'Limpopo', 'North West', 'Free State', 'Northern Cape', 'Mauritius',
 ];
 
 export default function QuickRate() {

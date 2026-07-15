@@ -49,10 +49,10 @@ export default function ProfilePage() {
           await Promise.all([
             supabase
               .from('ratings')
-              .select('overall, comment, created_at, course_id, courses(name, slug, town, province)')
+              .select('overall, comment, created_at, course_id, courses(name, slug, town, province, country)')
               .eq('user_id', u.user.id)
               .order('created_at', { ascending: false }),
-            supabase.from('courses').select('id', { count: 'exact', head: true }),
+            supabase.from('courses').select('id', { count: 'exact', head: true }).eq('country', 'South Africa'),
             supabase.from('nineteenth_ratings').select('created_at').eq('user_id', u.user.id),
             supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
             supabase.from('courses').select('province'),
@@ -90,6 +90,7 @@ export default function ProfilePage() {
     );
 
   const n = ratings.length;
+  const nSA = ratings.filter((r) => r.courses?.country !== 'Mauritius').length;
   const byProvince = {};
   for (const r of ratings) {
     const p = r.courses?.province;
@@ -129,7 +130,7 @@ export default function ProfilePage() {
             <div className="progress-track">
               <div
                 className="progress-fill"
-                style={{ width: `${Math.min(100, (n / total) * 100)}%` }}
+                style={{ width: `${Math.min(100, (nSA / total) * 100)}%` }}
               />
             </div>
           )}
@@ -140,7 +141,7 @@ export default function ProfilePage() {
           </p>
           <BragCard
             name={user.user_metadata?.display_name || user.user_metadata?.full_name || user.email.split('@')[0]}
-            rated={n}
+            rated={nSA}
             total={total || 0}
             badgeCount={earned.length}
             badgeNames={[...earned].sort((a, b) => b.goal - a.goal).map((b) => b.name)}
