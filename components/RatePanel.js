@@ -156,7 +156,7 @@ export default function RatePanel({
       <p className="notice" style={{ marginTop: 2 }}>
         {is19
           ? 'Separate from the course rating — this one is for the drinks, food and vibe after your round.'
-          : 'This rates the golf itself: value, conditions, greens, layout, halfway house and staff.'}
+          : 'This rates the golf itself: value, course condition, greens, layout, halfway house and staff.'}
       </p>
       {user === undefined ? (
         <p className="notice">Checking sign-in…</p>

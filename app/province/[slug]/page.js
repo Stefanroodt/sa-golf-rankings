@@ -14,7 +14,7 @@ export async function generateMetadata({ params }) {
   if (!province) return {};
   return {
     title: `Best golf courses in ${province} — ranked by golfers | Pin High`,
-    description: `Every GolfRSA-affiliated golf course in ${province}, ranked by ratings from everyday golfers. See rankings for value, conditions, greens, layout, halfway house and staff.`,
+    description: `Every GolfRSA-affiliated golf course in ${province}, ranked by ratings from everyday golfers. See rankings for value, course condition, greens, layout, halfway house and staff.`,
     alternates: { canonical: `/province/${params.slug}` },
     openGraph: {
       title: `Best golf courses in ${province} — ranked by golfers`,

@@ -14,7 +14,7 @@ function Stars({ value }) {
 const METRIC_SETS = {
   course: {
     'Best value': 'avg_value',
-    'Best conditions': 'avg_conditions',
+    'Best course condition': 'avg_conditions',
     'Best greens': 'avg_greens',
     'Best layout': 'avg_layout',
     'Best halfway house': 'avg_clubhouse',

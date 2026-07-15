@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
   if (!course) return {};
   const description =
     course.description ||
-    `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, conditions, greens, layout, halfway house and staff.`;
+    `${course.name} in ${course.town}, ${course.province}: ratings and reviews from everyday golfers on value, course condition, greens, layout, halfway house and staff.`;
   return {
     title: `${course.name} — golfer reviews & ratings | Pin High`,
     description,
