@@ -12,12 +12,16 @@ export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // Count in-app navigations so course pages know whether "Back" has
-  // somewhere sensible to return to.
+  // Keep our own in-app trail so "Back" never leaves the site
+  // (browser history may point at whatever page the visitor came from).
   useEffect(() => {
     try {
-      const n = Number(sessionStorage.getItem('ph-nav') || 0) + 1;
-      sessionStorage.setItem('ph-nav', String(n));
+      const url = window.location.pathname + window.location.search;
+      const st = JSON.parse(sessionStorage.getItem('ph-stack') || '[]');
+      if (st[st.length - 1] !== url) {
+        st.push(url);
+        sessionStorage.setItem('ph-stack', JSON.stringify(st.slice(-25)));
+      }
     } catch {}
   }, [pathname]);
 

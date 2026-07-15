@@ -9,13 +9,23 @@ export default function BackLink() {
       href="/"
       className="back-link"
       onClick={(e) => {
-        // If the visitor navigated here from within Pin High, go back to
-        // where they actually were; otherwise fall through to the rankings.
-        const hops = Number(sessionStorage.getItem('ph-nav') || 0);
-        if (hops > 1 && window.history.length > 1) {
-          e.preventDefault();
-          router.back();
-        }
+        // Only ever go back to a page within Pin High. We keep our own
+        // trail of in-app pages; browser history can point at an external
+        // site (e.g. when arriving from a shared link), which would throw
+        // the visitor out of the app entirely.
+        try {
+          const st = JSON.parse(sessionStorage.getItem('ph-stack') || '[]');
+          const here = window.location.pathname + window.location.search;
+          while (st.length && st[st.length - 1] === here) st.pop();
+          const prev = st[st.length - 1];
+          if (prev && prev !== here) {
+            e.preventDefault();
+            sessionStorage.setItem('ph-stack', JSON.stringify(st));
+            router.push(prev);
+            return;
+          }
+        } catch {}
+        // No in-app history — the plain href takes them to the rankings.
       }}
     >
       ← Back
