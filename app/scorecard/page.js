@@ -22,7 +22,7 @@ export default async function ScorecardHub() {
             <span className="section-switch-title">Course Ratings</span>
             <span className="section-switch-sub">Rate &amp; browse courses</span>
           </Link>
-          <h1 style={{ marginTop: 16 }}>📋 Scorecard</h1>
+          <h1 style={{ marginTop: 16 }}>📋 My score cards</h1>
           <div className="meta">
             Pick your course and start scoring — {courses.length} courses with full hole-by-hole cards
           </div>
