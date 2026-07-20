@@ -52,10 +52,10 @@ export default function ProfilePage() {
               .select('overall, comment, created_at, course_id, courses(name, slug, town, province, country)')
               .eq('user_id', u.user.id)
               .order('created_at', { ascending: false }),
-            supabase.from('courses').select('id', { count: 'exact', head: true }).eq('country', 'South Africa'),
+            supabase.from('courses').select('id', { count: 'exact', head: true }).eq('country', 'South Africa').eq('hide_from_rankings', false),
             supabase.from('nineteenth_ratings').select('created_at').eq('user_id', u.user.id),
             supabase.from('photos').select('id', { count: 'exact', head: true }).eq('user_id', u.user.id),
-            supabase.from('courses').select('province'),
+            supabase.from('courses').select('province').eq('hide_from_rankings', false),
             supabase.from('first_raters').select('course_id', { count: 'exact', head: true }).eq('user_id', u.user.id),
           ]);
         const { data: ph } = await supabase

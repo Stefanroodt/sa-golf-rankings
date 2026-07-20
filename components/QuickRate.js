@@ -24,6 +24,7 @@ export default function QuickRate() {
     supabase
       .from('course_rankings')
       .select('id, slug, name, town, province, holes, n_ratings')
+      .eq('hide_from_rankings', false)
       .order('name')
       .then(({ data }) => setCourses(data || []));
     (async () => {

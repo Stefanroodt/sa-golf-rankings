@@ -16,8 +16,9 @@ export default function PlayedProgress() {
           .from('ratings')
           .select('id, courses!inner(id)', { count: 'exact', head: true })
           .eq('user_id', u.user.id)
-          .eq('courses.country', 'South Africa'),
-        supabase.from('courses').select('id', { count: 'exact', head: true }).eq('country', 'South Africa'),
+          .eq('courses.country', 'South Africa')
+          .eq('courses.hide_from_rankings', false),
+        supabase.from('courses').select('id', { count: 'exact', head: true }).eq('country', 'South Africa').eq('hide_from_rankings', false),
       ]);
       if (mine !== null && total) setStats({ mine, total });
     };

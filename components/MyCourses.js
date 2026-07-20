@@ -28,7 +28,7 @@ export default function MyCourses() {
       setUser(u.user);
       if (!u.user) return;
       const [{ data: cs }, { data: rs }] = await Promise.all([
-        supabase.from('courses').select('id, slug, name, town, province, country, holes').order('name'),
+        supabase.from('courses').select('id, slug, name, town, province, country, holes').eq('hide_from_rankings', false).order('name'),
         supabase.from('ratings').select('course_id, overall').eq('user_id', u.user.id),
       ]);
       setCourses(cs || []);
