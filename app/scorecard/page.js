@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ScorecardPicker from '../../components/ScorecardPicker';
+import MyScores from '../../components/MyScores';
 import { getScorecardCourses } from '../../lib/server';
 
 export const revalidate = 300;
@@ -27,7 +28,8 @@ export default async function ScorecardHub() {
           </div>
         </div>
       </section>
-      <div className="container" style={{ paddingTop: 8 }}>
+      <div className="container" style={{ paddingTop: 16 }}>
+        <MyScores />
         <ScorecardPicker courses={courses} />
         <p className="notice" style={{ marginBottom: 40 }}>
           Played somewhere not listed here? Every course on Pin High still lets you log a total score —
