@@ -12,7 +12,7 @@ export default function MyCoursesPage() {
     <>
       <section className="course-head">
         <div className="container">
-          <h1>Your course card</h1>
+          <h1>Your Courses Tracking</h1>
           <div className="meta">Every course you&apos;ve rated — and every one still waiting</div>
         </div>
       </section>
