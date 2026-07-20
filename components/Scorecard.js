@@ -151,7 +151,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
                   value={playedAt}
                   max={new Date().toISOString().slice(0, 10)}
                   onChange={(e) => setPlayedAt(e.target.value)}
-                  style={{ marginLeft: 6, padding: '5px 8px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 13 }}
+                  style={{ marginLeft: 6, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
                 />
               </label>
 
@@ -206,7 +206,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
                     value={total}
                     placeholder="e.g. 87"
                     onChange={(e) => setTotal(e.target.value)}
-                    style={{ marginLeft: 6, width: 90, padding: '5px 8px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 14 }}
+                    style={{ marginLeft: 6, width: 96, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
                   />
                 </label>
               )}

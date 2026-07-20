@@ -164,7 +164,7 @@ export default function MyCourses() {
           <select
             value={sortBy}
             onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
-            style={{ padding: '7px 10px', border: '1px solid var(--cream-dark)', borderRadius: 20, fontSize: 13, background: '#fff', color: 'var(--ink)', marginLeft: 'auto' }}
+            style={{ padding: '9px 12px', border: '1px solid var(--cream-dark)', borderRadius: 20, fontSize: 16, background: '#fff', color: 'var(--ink)', marginLeft: 'auto' }}
           >
             {Object.keys(ratedSorters).map((s) => <option key={s}>{s}</option>)}
           </select>

@@ -18,7 +18,12 @@ body {
   background: var(--cream);
   color: var(--ink);
   line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
+/* Never let a stray wide element cause a horizontal scrollbar on mobile */
+html, body { overflow-x: hidden; }
+img { max-width: 100%; height: auto; }
 
 a { color: inherit; text-decoration: none; }
 
@@ -159,8 +164,8 @@ a { color: inherit; text-decoration: none; }
   margin: 24px 0 8px;
 }
 .controls select, .controls input {
-  padding: 9px 12px; border: 1px solid var(--cream-dark); border-radius: 8px;
-  background: var(--card); font-size: 14px; color: var(--ink);
+  padding: 10px 12px; border: 1px solid var(--cream-dark); border-radius: 8px;
+  background: var(--card); font-size: 16px; color: var(--ink);
 }
 .controls input { flex: 1; min-width: 180px; }
 
@@ -255,7 +260,7 @@ a { color: inherit; text-decoration: none; }
 }
 textarea {
   width: 100%; border: 1px solid var(--cream-dark); border-radius: 8px;
-  padding: 10px; font-size: 14px; font-family: inherit; min-height: 70px; margin-top: 6px;
+  padding: 10px; font-size: 16px; font-family: inherit; min-height: 70px; margin-top: 6px;
 }
 .btn {
   display: inline-block; background: var(--green-mid); color: var(--cream);
@@ -280,8 +285,8 @@ textarea {
 /* Auth */
 .auth-wrap { max-width: 400px; margin: 48px auto; }
 .auth-wrap input {
-  width: 100%; padding: 11px 12px; border: 1px solid var(--cream-dark);
-  border-radius: 8px; font-size: 14px; margin-bottom: 10px;
+  width: 100%; padding: 12px 12px; border: 1px solid var(--cream-dark);
+  border-radius: 8px; font-size: 16px; margin-bottom: 10px;
 }
 .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
 .tabs button {
@@ -428,7 +433,7 @@ footer {
   .hero p { font-size: 14.5px; }
 
   .controls { gap: 8px; }
-  .controls select { flex: 1 1 45%; font-size: 13px; padding: 8px 8px; }
+  .controls select { flex: 1 1 45%; font-size: 16px; padding: 10px 8px; }
   .controls input { flex: 1 1 100%; }
 
   .rank-card { padding: 12px 12px; gap: 10px; }
@@ -490,20 +495,22 @@ footer {
   border-radius: 8px;
   padding: 5px 3px;
 }
-.hole-cell .hole-num { font-weight: 700; font-size: 12px; color: var(--green-deep); }
-.hole-cell .hole-par { font-size: 10px; color: var(--muted); }
+.hole-cell .hole-num { font-weight: 700; font-size: 13px; color: var(--green-deep); }
+.hole-cell .hole-par { font-size: 11px; color: var(--muted); }
 .hole-cell input {
   width: 100%;
-  max-width: 44px;
+  max-width: 64px;
   text-align: center;
-  padding: 4px 2px;
+  padding: 8px 2px;
   border: 1px solid var(--cream-dark);
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 17px;
   font-weight: 700;
+  min-height: 44px;   /* comfortable thumb target */
 }
 @media (max-width: 520px) {
-  .holes-grid { grid-template-columns: repeat(3, 1fr); }
+  .holes-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .hole-cell { padding: 8px 4px; }
 }
 
 /* Play hub — the logged-in home menu */

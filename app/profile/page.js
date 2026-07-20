@@ -172,7 +172,7 @@ export default function ProfilePage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              style={{ padding: '7px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 13, background: '#fff', color: 'var(--ink)' }}
+              style={{ padding: '9px 12px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16, background: '#fff', color: 'var(--ink)' }}
             >
               {Object.keys(sorters).map((s) => <option key={s}>{s}</option>)}
             </select>
