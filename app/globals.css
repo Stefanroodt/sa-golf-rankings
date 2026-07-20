@@ -551,3 +551,16 @@ footer {
 
 /* Distraction-free scoring page */
 .score-wrap { max-width: 640px; margin: 0 auto; padding: 24px 20px 60px; }
+
+/* Live running total on the scorecard */
+.run-total {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--green-deep); color: var(--cream);
+  border-radius: 12px; padding: 12px 18px; margin: 12px 0 0;
+}
+.run-total-label { font-size: 13px; color: #cfe0d5; }
+.run-total-value { font-size: 26px; font-weight: 800; display: inline-flex; align-items: baseline; gap: 8px; }
+.run-total-par { font-size: 15px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.run-total-par.over { background: rgba(201,162,39,.22); color: var(--gold); }
+.run-total-par.under { background: rgba(126,210,168,.22); color: #7ed2a8; }
+.run-total-par.even { background: rgba(247,243,233,.18); color: var(--cream); }

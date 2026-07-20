@@ -64,6 +64,13 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
     () => Object.values(holes).filter((v) => parseInt(v, 10) > 0).length,
     [holes]
   );
+  // Par of the holes filled so far, so the running score-to-par makes sense
+  const filledPar = useMemo(
+    () => scorecard.reduce((s, h) => s + (parseInt(holes[h.hole], 10) > 0 ? h.par : 0), 0),
+    [holes, scorecard]
+  );
+  const toPar = holesTotal - filledPar;
+  const toParStr = toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : `${toPar}`;
 
   async function saveRound() {
     if (!user) return;
@@ -167,12 +174,24 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
                       </label>
                     ))}
                   </div>
-                  <p className="notice" style={{ margin: '8px 0' }}>
-                    {holesFilled}/{scorecard.length} holes ·{' '}
-                    {holesFilled === scorecard.length
-                      ? <strong>Total {holesTotal}{coursePar ? ` (${holesTotal - coursePar >= 0 ? '+' : ''}${holesTotal - coursePar})` : ''}</strong>
-                      : 'fill every hole, or just enter your total below'}
-                  </p>
+                  <div className="run-total">
+                    <span className="run-total-label">
+                      Running total · {holesFilled}/{scorecard.length} holes
+                    </span>
+                    <span className="run-total-value">
+                      {holesTotal || 0}
+                      {holesFilled > 0 && (
+                        <span className={`run-total-par ${toPar > 0 ? 'over' : toPar < 0 ? 'under' : 'even'}`}>
+                          {toParStr}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  {holesFilled < scorecard.length && (
+                    <p className="notice" style={{ margin: '4px 0 0' }}>
+                      Fill every hole for a full card, or just enter your total below.
+                    </p>
+                  )}
                 </>
               ) : null}
 
