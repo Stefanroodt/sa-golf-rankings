@@ -40,7 +40,7 @@ export default function ScorecardPicker({ courses }) {
 
       <div style={{ marginBottom: 48 }}>
         {shown.map((c) => (
-          <Link key={c.id} href={`/course/${c.slug}?score=1`} className="search-result">
+          <Link key={c.id} href={`/score/${c.slug}`} className="search-result">
             <span>
               <strong>{c.name}</strong>
               {c.holes < 18 && <span className="badge">{c.holes} holes</span>}

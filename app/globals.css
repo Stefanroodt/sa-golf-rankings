@@ -548,3 +548,6 @@ footer {
   font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
   color: #6b5a1e; margin-top: 2px;
 }
+
+/* Distraction-free scoring page */
+.score-wrap { max-width: 640px; margin: 0 auto; padding: 24px 20px 60px; }
