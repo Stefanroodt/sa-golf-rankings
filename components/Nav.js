@@ -89,10 +89,10 @@ export default function Nav() {
                     <span className="nav-menu-backdrop" onClick={() => setMenuOpen(false)} />
                     <span className="nav-menu">
                       <Link href="/profile" className="chip" onClick={() => setMenuOpen(false)}>
-                        🏅 Badges &amp; Scores
+                        🏅 Badges
                       </Link>
                       <Link href="/my-courses" className="chip" onClick={() => setMenuOpen(false)}>
-                        ⛳ My Ratings &amp; Courses
+                        ⛳ Ratings, Courses &amp; Scores
                       </Link>
                     </span>
                   </>

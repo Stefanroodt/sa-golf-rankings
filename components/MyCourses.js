@@ -21,6 +21,7 @@ export default function MyCourses() {
   const [sortBy, setSortBy] = useState('A–Z');
   const [page, setPage] = useState(0);
   const [extras, setExtras] = useState({ n19: 0, nPhotos: 0, nFirsts: 0 });
+  const [rounds, setRounds] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -41,6 +42,12 @@ export default function MyCourses() {
         supabase.from('first_raters').select('course_id', { count: 'exact', head: true }).eq('user_id', u.user.id),
       ]);
       setExtras({ n19: n19 || 0, nPhotos: nPhotos || 0, nFirsts: nFirsts || 0 });
+      const { data: rds } = await supabase
+        .from('rounds').select('id, course_id, played_at, total_score')
+        .eq('user_id', u.user.id)
+        .order('played_at', { ascending: false })
+        .limit(100);
+      setRounds(rds || []);
     })();
   }, []);
 
@@ -108,6 +115,16 @@ export default function MyCourses() {
     : [...ratedList, ...unratedList]; // rated first, still-to-rate underneath
   const pages = Math.ceil(filtered.length / PAGE);
   const shown = filtered.slice(page * PAGE, (page + 1) * PAGE);
+
+  // Scores: rounds at rated courses are visible; the rest stay locked until rated
+  const courseById = Object.fromEntries(courses.map((c) => [c.id, c]));
+  const visibleRounds = rounds.filter((r) => mine[r.course_id] != null && courseById[r.course_id]);
+  const lockedRounds = rounds.length - visibleRounds.length;
+  const bestByCourse = {};
+  for (const r of visibleRounds) {
+    if (!bestByCourse[r.course_id] || r.total_score < bestByCourse[r.course_id])
+      bestByCourse[r.course_id] = r.total_score;
+  }
   const shownRated = shown.filter((c) => mine[c.id] != null);
   const shownUnrated = shown.filter((c) => mine[c.id] == null);
 
@@ -170,6 +187,52 @@ export default function MyCourses() {
           </select>
         </div>
       </div>
+
+      {(visibleRounds.length > 0 || lockedRounds > 0) && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <h2>📋 My scores</h2>
+          {visibleRounds.length > 0 && (
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+              <thead>
+                <tr style={{ textAlign: 'left', color: 'var(--muted)', fontSize: 12 }}>
+                  <th style={{ padding: '6px 8px 6px 0', fontWeight: 700 }}>Course</th>
+                  <th style={{ padding: '6px 8px', fontWeight: 700 }}>Date</th>
+                  <th style={{ padding: '6px 0', fontWeight: 700, textAlign: 'right' }}>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRounds.map((r) => (
+                  <tr key={r.id} style={{ borderTop: '1px solid var(--cream-dark)' }}>
+                    <td style={{ padding: '8px 8px 8px 0' }}>
+                      <Link href={`/course/${courseById[r.course_id].slug}`} style={{ textDecoration: 'underline' }}>
+                        {courseById[r.course_id].name}
+                      </Link>
+                    </td>
+                    <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--muted)' }}>
+                      {new Date(r.played_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </td>
+                    <td style={{ padding: '8px 0', textAlign: 'right', fontWeight: 700 }}>
+                      {r.total_score}
+                      {r.total_score === bestByCourse[r.course_id] &&
+                        visibleRounds.filter((x) => x.course_id === r.course_id).length > 1 && (
+                          <span className="badge badge-played" style={{ marginLeft: 6 }}>Best</span>
+                        )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {lockedRounds > 0 && (
+            <p className="notice" style={{ marginTop: 10, borderLeft: '3px solid var(--gold)', paddingLeft: 10 }}>
+              🔒 {lockedRounds} round{lockedRounds === 1 ? '' : 's'} hidden — rate those courses to see the scores here.
+            </p>
+          )}
+          <p className="notice" style={{ marginTop: 10 }}>
+            Log a round from any course page — open a course below and tap “+ Log a round”.
+          </p>
+        </div>
+      )}
 
       <div style={{ margin: '16px 0 48px' }}>
         {shownRated.length > 0 && (
