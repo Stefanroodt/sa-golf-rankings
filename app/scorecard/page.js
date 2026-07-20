@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import BackLink from '../../components/BackLink';
 import ScorecardPicker from '../../components/ScorecardPicker';
 import { getScorecardCourses } from '../../lib/server';
 
@@ -16,10 +15,13 @@ export default async function ScorecardHub() {
 
   return (
     <>
-      <section className="course-head">
+      <section className="course-head" style={{ paddingBottom: 18 }}>
         <div className="container">
-          <BackLink />
-          <h1>📋 Scorecard</h1>
+          <Link href="/" className="section-switch">
+            <span className="section-switch-title">Course Ratings</span>
+            <span className="section-switch-sub">Rate &amp; browse courses</span>
+          </Link>
+          <h1 style={{ marginTop: 16 }}>📋 Scorecard</h1>
           <div className="meta">
             Pick your course and start scoring — {courses.length} courses with full hole-by-hole cards
           </div>

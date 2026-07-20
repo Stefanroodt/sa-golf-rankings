@@ -23,11 +23,12 @@ export default async function Home() {
             course — and you&apos;ve got opinions of your own. Which are your
             favourites? Rate them and have your say.
           </p>
+          <Link href="/scorecard" className="hero-scorecard">📋 Scorecard</Link>
           <Link href="/rate" className="hero-rate">Rate a course now ★</Link>
-          <InstallApp className="hero-feedback" label="📲 Get the app" />
           <Link href="/19th-holes" className="hero-nineteenth">
             Best 19th Holes ⛳
           </Link>
+          <div><InstallApp className="hero-install" label="📲 Get the app" /></div>
         </div>
       </section>
 
