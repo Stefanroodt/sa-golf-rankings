@@ -25,13 +25,13 @@ export default function AuthPage() {
       });
       setBusy(false);
       if (error) return setStatus({ type: 'error', msg: error.message });
-      if (data.session) router.push('/');
+      if (data.session) router.push('/play');
       else setStatus({ type: 'success', msg: 'Check your email to confirm your account, then sign in.' });
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setBusy(false);
       if (error) return setStatus({ type: 'error', msg: error.message });
-      router.push('/');
+      router.push('/play');
     }
   }
 
@@ -81,7 +81,7 @@ export default function AuthPage() {
               setBusy(true);
               const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: window.location.origin },
+                options: { redirectTo: `${window.location.origin}/play` },
               });
               if (error) {
                 setBusy(false);
@@ -102,7 +102,7 @@ export default function AuthPage() {
               const { error } = await supabase.auth.signInWithOtp({
                 email,
                 options: {
-                  emailRedirectTo: window.location.origin,
+                  emailRedirectTo: `${window.location.origin}/play`,
                   data: { display_name: name.trim() || email.split('@')[0] },
                 },
               });

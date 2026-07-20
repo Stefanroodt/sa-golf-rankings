@@ -30,7 +30,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function CoursePage({ params }) {
+export default async function CoursePage({ params, searchParams }) {
   const course = await getCourse(params.slug);
   if (!course) notFound();
   const [ratings, ratings19, photos, scorecard] = await Promise.all([
@@ -220,7 +220,7 @@ export default async function CoursePage({ params }) {
 
         <div>
           <RatePanel course={course} />
-          <Scorecard course={course} scorecard={scorecard} />
+          <Scorecard course={course} scorecard={scorecard} autoOpen={searchParams?.score === '1'} />
           <RatePanel
             course={course}
             kind="nineteenth"

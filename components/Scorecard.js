@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 
 // Digital scorecard: anyone signed in can log a score, but your scoring
 // history for a course only unlocks once you've rated that course.
-export default function Scorecard({ course, scorecard = [] }) {
+export default function Scorecard({ course, scorecard = [], autoOpen = false }) {
   const [user, setUser] = useState(undefined);
   const [hasRated, setHasRated] = useState(false);
   const [rounds, setRounds] = useState(null);
@@ -16,6 +16,16 @@ export default function Scorecard({ course, scorecard = [] }) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState(null);
   const [entryOpen, setEntryOpen] = useState(false);
+  const wrapRef = useRef(null);
+
+  // Arriving from the Scorecard hub (/course/slug?score=1): open entry and scroll to it
+  useEffect(() => {
+    if (autoOpen) {
+      setEntryOpen(true);
+      const t = setTimeout(() => wrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250);
+      return () => clearTimeout(t);
+    }
+  }, [autoOpen]);
 
   const hasCard = scorecard.length >= 9;
   const coursePar = useMemo(
@@ -100,7 +110,7 @@ export default function Scorecard({ course, scorecard = [] }) {
   const best = rounds && rounds.length ? Math.min(...rounds.map((r) => r.total_score)) : null;
 
   return (
-    <div className="card">
+    <div className="card" ref={wrapRef}>
       <h2 style={{ marginBottom: 2 }}>
         📋 Scorecard
         {coursePar && (

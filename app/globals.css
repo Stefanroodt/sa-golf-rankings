@@ -498,3 +498,31 @@ footer {
 @media (max-width: 520px) {
   .holes-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Play hub — the logged-in home menu */
+.hub-wrap { max-width: 560px; margin: 0 auto; padding: 40px 20px 60px; }
+.hub-title { font-size: clamp(28px, 6vw, 40px); margin-bottom: 4px; }
+.hub-sub { color: var(--muted); margin-bottom: 28px; }
+.hub-menu { display: flex; flex-direction: column; gap: 16px; }
+.hub-btn {
+  display: block;
+  background: var(--green-deep, #0d2f24);
+  color: var(--cream);
+  border-radius: 18px;
+  padding: 34px 24px;
+  text-align: center;
+  text-decoration: none;
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+}
+.hub-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,.18); }
+.hub-btn-title { display: block; font-size: 26px; font-weight: 700; letter-spacing: .01em; }
+.hub-btn-sub {
+  display: block; margin-top: 8px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+  color: #9db3a4;
+}
+.hub-btn-soon { cursor: default; opacity: .6; }
+.hub-btn-soon:hover { transform: none; box-shadow: 0 6px 18px rgba(0,0,0,.12); }
+.hub-foot { text-align: center; margin-top: 26px; color: var(--muted); font-size: 14px; }
