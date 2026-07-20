@@ -6,7 +6,8 @@ import ReportButton from '../../../components/ReportButton';
 import PhotoUpload from '../../../components/PhotoUpload';
 import PhotoGallery from '../../../components/PhotoGallery';
 import BackLink from '../../../components/BackLink';
-import { getCourse, getRatings, getPhotos, photoUrl, provinceSlug } from '../../../lib/server';
+import Scorecard from '../../../components/Scorecard';
+import { getCourse, getRatings, getPhotos, getScorecard, photoUrl, provinceSlug } from '../../../lib/server';
 import { CATEGORIES, CATEGORIES19 } from '../../../lib/supabase';
 
 export const revalidate = 0; // always fresh
@@ -32,10 +33,11 @@ export async function generateMetadata({ params }) {
 export default async function CoursePage({ params }) {
   const course = await getCourse(params.slug);
   if (!course) notFound();
-  const [ratings, ratings19, photos] = await Promise.all([
+  const [ratings, ratings19, photos, scorecard] = await Promise.all([
     getRatings(course.id),
     getRatings(course.id, 'nineteenth_ratings'),
     getPhotos(course.id),
+    getScorecard(course.id),
   ]);
 
   const avg = (key) =>
@@ -218,6 +220,7 @@ export default async function CoursePage({ params }) {
 
         <div>
           <RatePanel course={course} />
+          <Scorecard course={course} scorecard={scorecard} />
           <RatePanel
             course={course}
             kind="nineteenth"
