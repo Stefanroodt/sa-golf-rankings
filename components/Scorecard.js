@@ -1,12 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 // Digital scorecard: anyone signed in can log a score, but your scoring
 // history for a course only unlocks once you've rated that course.
-export default function Scorecard({ course, scorecard = [], autoOpen = false }) {
+// `returnTo` — if set, saving a round navigates there (e.g. back to /handicap).
+export default function Scorecard({ course, scorecard = [], autoOpen = false, returnTo = null }) {
+  const router = useRouter();
   const [user, setUser] = useState(undefined);
   const [hasRated, setHasRated] = useState(false);
   const [rounds, setRounds] = useState(null);
@@ -113,6 +116,10 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
     setBusy(false);
     if (error) {
       setNote('Could not save the round — try again.');
+      return;
+    }
+    if (returnTo) {
+      router.push(returnTo);
       return;
     }
     setHoles({});

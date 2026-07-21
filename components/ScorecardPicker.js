@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const PROVINCES = [
   'All', 'Western Cape', 'Eastern Cape', 'KwaZulu-Natal', 'Gauteng',
@@ -11,6 +11,15 @@ const PROVINCES = [
 export default function ScorecardPicker({ courses }) {
   const [q, setQ] = useState('');
   const [prov, setProv] = useState('All');
+  const [suffix, setSuffix] = useState('');
+
+  // Arrived from the handicap page? Carry the marker through to the score page
+  // so saving a round there returns to /handicap. (Read client-side to keep
+  // the scorecard hub statically cached.)
+  useEffect(() => {
+    const from = new URLSearchParams(window.location.search).get('from');
+    if (from === 'handicap') setSuffix('?from=handicap');
+  }, []);
 
   const shown = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -40,7 +49,7 @@ export default function ScorecardPicker({ courses }) {
 
       <div style={{ marginBottom: 48 }}>
         {shown.map((c) => (
-          <Link key={c.id} href={`/score/${c.slug}`} className="search-result">
+          <Link key={c.id} href={`/score/${c.slug}${suffix}`} className="search-result">
             <span>
               <strong>{c.name}</strong>
               {c.holes < 18 && <span className="badge">{c.holes} holes</span>}

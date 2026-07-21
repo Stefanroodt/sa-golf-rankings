@@ -170,7 +170,7 @@ export default function HandicapPage() {
       )}
 
       <p className="notice" style={{ marginTop: 16 }}>
-        <Link href="/scorecard" style={{ textDecoration: 'underline' }}>Log another round →</Link>
+        <Link href="/scorecard?from=handicap" style={{ textDecoration: 'underline' }}>Log another round →</Link>
       </p>
     </div>
   );
