@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { canSeeHandicap } from '../lib/handicap';
 import FeedbackButton from './FeedbackForm';
 
 export default function Nav() {
@@ -93,6 +94,11 @@ export default function Nav() {
                       <Link href="/my-courses" className="chip" onClick={() => setMenuOpen(false)}>
                         ⛳ Ratings, Courses &amp; Scores
                       </Link>
+                      {canSeeHandicap(user.email) && (
+                        <Link href="/handicap" className="chip" onClick={() => setMenuOpen(false)}>
+                          🏌️ Handicap
+                        </Link>
+                      )}
                     </span>
                   </>
                 )}

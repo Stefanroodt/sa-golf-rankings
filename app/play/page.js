@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-
-const HANDICAP_PREVIEW = ['stevelroodt@gmail.com'];
+import { canSeeHandicap } from '../../lib/handicap';
 
 export default function PlayHub() {
   const [name, setName] = useState(null);
@@ -15,7 +14,7 @@ export default function PlayHub() {
       const u = data.user;
       if (u) {
         setName(u.user_metadata?.display_name || u.user_metadata?.full_name || u.email.split('@')[0]);
-        setCanHandicap(HANDICAP_PREVIEW.includes(u.email));
+        setCanHandicap(canSeeHandicap(u.email));
       }
     });
   }, []);

@@ -3,9 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-
-// Test allow-list while the feature is in preview.
-const ALLOW = ['stevelroodt@gmail.com'];
+import { HANDICAP_PREVIEW as ALLOW } from '../../lib/handicap';
 
 // How many of the best differentials to average, scaled to how many rounds
 // you have — mirrors the WHS "best 8 of last 20" idea in a simplified way.
