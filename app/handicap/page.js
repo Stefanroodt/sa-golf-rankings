@@ -33,7 +33,7 @@ export default function HandicapPage() {
       if (!u.user || !ALLOW.includes(u.user.email)) return;
       const { data: rds } = await supabase
         .from('rounds')
-        .select('id, course_id, played_at, total_score, courses(name, slug)')
+        .select('id, course_id, played_at, total_score, tee_name, course_rating, slope, courses(name, slug)')
         .eq('user_id', u.user.id)
         .order('played_at', { ascending: false })
         .limit(50);
@@ -52,17 +52,23 @@ export default function HandicapPage() {
   }, []);
 
   const calc = useMemo(() => {
-    // Only 18-hole rounds at courses where we know par
+    // WHS-style differential where we have course rating + slope for the tee played:
+    //   diff = (score - course rating) * 113 / slope
+    // Otherwise fall back to a simple score-minus-par differential.
     const diffs = rounds
-      .filter((r) => {
+      .map((r) => {
+        if (r.course_rating && r.slope) {
+          return { ...r, diff: Math.round(((r.total_score - Number(r.course_rating)) * 113 / r.slope) * 10) / 10, whs: true };
+        }
         const par = parByCourse[r.course_id];
-        return par && par >= 66 && par <= 74;
+        if (par && par >= 66 && par <= 74) return { ...r, diff: r.total_score - par, whs: false };
+        return null;
       })
-      .map((r) => ({ ...r, par: parByCourse[r.course_id], diff: r.total_score - parByCourse[r.course_id] }));
+      .filter(Boolean);
     const last20 = diffs.slice(0, 20);
     const k = bestCount(last20.length);
     const best = [...last20].sort((a, b) => a.diff - b.diff).slice(0, k);
-    const index = k ? best.reduce((s, x) => s + x.diff, 0) / k : null;
+    const index = k ? Math.round((best.reduce((s, x) => s + x.diff, 0) / k) * 10) / 10 : null;
     const bestIds = new Set(best.map((x) => x.id));
     return { diffs, last20, k, index, bestIds };
   }, [rounds, parByCourse]);
@@ -106,8 +112,9 @@ export default function HandicapPage() {
       </div>
       <h1 style={{ fontSize: 26, marginBottom: 4 }}>🏌️ Your Pin High Number</h1>
       <p className="notice" style={{ marginTop: 0 }}>
-        An unofficial handicap-style index from your logged rounds, measured against par. Not a
-        GolfRSA handicap — just a Pin High number that moves as you play.
+        An unofficial handicap-style index from your logged rounds, using each course&apos;s rating and
+        slope for the tee you played — (score − rating) × 113 ÷ slope. Not a GolfRSA handicap, but the
+        same maths behind one. It moves as you play.
       </p>
 
       <div className="card" style={{ textAlign: 'center', marginTop: 16, background: 'var(--green-deep)', color: 'var(--cream)' }}>
@@ -120,7 +127,7 @@ export default function HandicapPage() {
           </p>
         ) : (
           <p className="notice" style={{ color: '#cfe0d5' }}>
-            Best {calc.k} of your last {calc.last20.length} round{calc.last20.length === 1 ? '' : 's'}, versus par.
+            Average of the best {calc.k} of your last {calc.last20.length} round{calc.last20.length === 1 ? '' : 's'}.
           </p>
         )}
       </div>
@@ -134,7 +141,7 @@ export default function HandicapPage() {
                 <th style={{ padding: '6px 8px 6px 0', fontWeight: 700 }}>Course</th>
                 <th style={{ padding: '6px 8px', fontWeight: 700 }}>Date</th>
                 <th style={{ padding: '6px 8px', fontWeight: 700, textAlign: 'right' }}>Score</th>
-                <th style={{ padding: '6px 0', fontWeight: 700, textAlign: 'right' }}>vs Par</th>
+                <th style={{ padding: '6px 0', fontWeight: 700, textAlign: 'right' }}>Diff</th>
               </tr>
             </thead>
             <tbody>
@@ -144,6 +151,7 @@ export default function HandicapPage() {
                     <Link href={`/course/${r.courses.slug}`} style={{ textDecoration: 'underline' }}>
                       {r.courses.name}
                     </Link>
+                    {r.tee_name && <span className="meta-sub"> · {r.tee_name}</span>}
                     {calc.bestIds.has(r.id) && <span className="badge badge-played" style={{ marginLeft: 6 }}>counted</span>}
                   </td>
                   <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--muted)' }}>

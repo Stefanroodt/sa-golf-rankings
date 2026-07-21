@@ -16,6 +16,8 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState(null);
   const [entryOpen, setEntryOpen] = useState(false);
+  const [tees, setTees] = useState([]);
+  const [teeIdx, setTeeIdx] = useState('');
   const wrapRef = useRef(null);
 
   // Arriving from the Scorecard hub (/course/slug?score=1): open entry and scroll to it
@@ -35,6 +37,19 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
 
   useEffect(() => {
     (async () => {
+      const { data: teeData } = await supabase
+        .from('course_tees')
+        .select('tee, gender, par, course_rating, slope')
+        .eq('course_id', course.id)
+        .order('course_rating', { ascending: false });
+      const ts = teeData || [];
+      setTees(ts);
+      // Default to men's White, else first men's, else first
+      if (ts.length) {
+        const def = ts.findIndex((t) => t.gender === 'M' && /white/i.test(t.tee));
+        const men = ts.findIndex((t) => t.gender === 'M');
+        setTeeIdx(String(def >= 0 ? def : men >= 0 ? men : 0));
+      }
       const { data: u } = await supabase.auth.getUser();
       setUser(u.user);
       if (!u.user) return;
@@ -82,6 +97,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
     }
     setBusy(true);
     setNote(null);
+    const tee = tees[parseInt(teeIdx, 10)] || null;
     const { error } = await supabase.from('rounds').insert({
       user_id: user.id,
       course_id: course.id,
@@ -90,6 +106,9 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
       hole_scores: usingHoles
         ? Object.fromEntries(scorecard.map((h) => [h.hole, parseInt(holes[h.hole], 10)]))
         : null,
+      tee_name: tee ? tee.tee : null,
+      course_rating: tee ? tee.course_rating : null,
+      slope: tee ? tee.slope : null,
     });
     setBusy(false);
     if (error) {
@@ -154,6 +173,26 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false }) 
                   style={{ marginLeft: 6, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
                 />
               </label>
+
+              {tees.length > 0 && (
+                <label className="notice" style={{ display: 'block', marginBottom: 8 }}>
+                  Tees played{' '}
+                  <select
+                    value={teeIdx}
+                    onChange={(e) => setTeeIdx(e.target.value)}
+                    style={{ marginLeft: 6, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16, background: '#fff', color: 'var(--ink)' }}
+                  >
+                    {tees.map((t, i) => (
+                      <option key={i} value={i}>
+                        {t.tee}{t.gender === 'W' ? ' ♀' : ''} · {t.course_rating}/{t.slope}
+                      </option>
+                    ))}
+                  </select>
+                  <span style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
+                    Course rating &amp; slope for this tee — used for your Pin High Number.
+                  </span>
+                </label>
+              )}
 
               {hasCard ? (
                 <>
