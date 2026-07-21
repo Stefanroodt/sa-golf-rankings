@@ -113,7 +113,8 @@ export default function ScoringStats() {
     <div className="card" style={{ marginTop: 16 }}>
       <h2 style={{ marginBottom: 2 }}>📊 Your game in numbers</h2>
       <p className="notice" style={{ marginTop: 2 }}>
-        From {stats.holesTotal} holes scored hole-by-hole across {stats.rounds} round{stats.rounds === 1 ? '' : 's'}.
+        Your average score on par 3s, 4s and 5s — from {stats.holesTotal} holes scored hole-by-hole
+        across {stats.rounds} round{stats.rounds === 1 ? '' : 's'}.
       </p>
 
       <div className="stat-grid">
