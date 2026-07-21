@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { HANDICAP_PREVIEW as ALLOW } from '../../lib/handicap';
 import ScoringStats from '../../components/ScoringStats';
+import PlayingHandicap from '../../components/PlayingHandicap';
 
 // How many of the best differentials to average, scaled to how many rounds
 // you have — mirrors the WHS "best 8 of last 20" idea in a simplified way.
@@ -130,6 +131,8 @@ export default function HandicapPage() {
           </p>
         )}
       </div>
+
+      <PlayingHandicap defaultIndex={calc.index} />
 
       {calc.diffs.length > 0 && (
         <div className="card" style={{ marginTop: 16 }}>
