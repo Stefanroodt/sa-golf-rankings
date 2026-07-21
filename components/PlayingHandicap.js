@@ -8,12 +8,12 @@ import { supabase } from '../lib/supabase';
 //   Course Handicap  = index × (slope ÷ 113) + (CR − par)
 //   Playing Handicap = Course Handicap × allowance
 const ALLOWANCES = [
-  ['100', 'Singles / medal — 100%'],
-  ['95', 'Alliance / stableford — 95%'],
-  ['90', '4BBB matchplay — 90%'],
-  ['85', 'Betterball strokeplay — 85%'],
-  ['75', 'Mixed events — 75%'],
-  ['50', 'Foursomes — 50%'],
+  ['100', '100%'],
+  ['95', '95%'],
+  ['90', '90%'],
+  ['85', '85%'],
+  ['80', '80%'],
+  ['75', '75%'],
 ];
 
 const inputStyle = {
