@@ -164,10 +164,6 @@ export default function ScoringStats() {
           </span>
         </div>
       )}
-      <p className="notice" style={{ marginTop: 6, fontSize: 12 }}>
-        Strokes gained compares your score on each hole with the average of every golfer who scored
-        that hole on Pin High. It sharpens as more golfers log rounds.
-      </p>
     </div>
   );
 }
