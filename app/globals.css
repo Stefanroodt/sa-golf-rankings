@@ -571,3 +571,83 @@ footer {
 .run-total-par.over { background: rgba(201,162,39,.22); color: var(--gold); }
 .run-total-par.under { background: rgba(126,210,168,.22); color: #7ed2a8; }
 .run-total-par.even { background: rgba(247,243,233,.18); color: var(--cream); }
+
+/* ---- Your game in numbers (ScoringStats) ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+.stat-tile {
+  background: var(--cream);
+  border: 1px solid var(--cream-dark);
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+}
+.stat-tile.stat-best {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+.stat-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--green-deep);
+}
+.stat-sub { font-size: 12px; }
+.stat-sub.over { color: #a05a4b; }
+.stat-sub.under { color: #2c6b4c; }
+
+.dist-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  margin-top: 14px;
+  background: var(--cream-dark);
+}
+.dist-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+.dist-chip { display: inline-flex; align-items: center; gap: 5px; }
+.dist-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.gained-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: var(--green-deep);
+  border-radius: 10px;
+  color: var(--cream);
+}
+.gained-label { font-size: 13px; }
+.gained-value { font-weight: 800; font-size: 18px; }
+.gained-value.under { color: var(--gold); }
+.gained-value.over { color: #e8b4a5; }
+
+@media (max-width: 480px) {
+  .stat-grid { gap: 7px; }
+  .stat-value { font-size: 23px; }
+}
