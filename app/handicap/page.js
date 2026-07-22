@@ -82,7 +82,7 @@ export default function HandicapPage() {
       <div className="container auth-wrap">
         <div className="card">
           <h2>Pin High Number</h2>
-          <p className="notice">Sign in to see your handicap index.</p>
+          <p className="notice">Sign in to see your Pin High Number.</p>
           <Link href="/auth" className="btn btn-gold">Sign in</Link>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function HandicapPage() {
       </div>
       <h1 style={{ fontSize: 26, marginBottom: 4 }}>🏌️ Your Pin High Number</h1>
       <p className="notice" style={{ marginTop: 0 }}>
-        An unofficial handicap-style index from your logged rounds, using each course&apos;s rating and
+        An unofficial handicap-style number from your logged rounds, using each course&apos;s rating and
         slope for the tee you played — (score − rating) × 113 ÷ slope. Not a GolfRSA handicap, but the
         same maths behind one. It moves as you play.
       </p>

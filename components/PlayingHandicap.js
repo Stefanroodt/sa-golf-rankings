@@ -82,11 +82,11 @@ export default function PlayingHandicap({ defaultIndex = null }) {
     <div className="card" style={{ marginTop: 16 }}>
       <h2 style={{ marginBottom: 2 }}>🎯 Playing handicap</h2>
       <p className="notice" style={{ marginTop: 2 }}>
-        What you play off today — your index adjusted for the course, the tees and the format.
+        What you play off today — your number adjusted for the course, the tees and the format.
       </p>
 
       <label className="notice" style={{ display: 'block', marginBottom: 8 }}>
-        Handicap index{' '}
+        Your number{' '}
         <input
           type="number"
           step="0.1"
@@ -98,7 +98,7 @@ export default function PlayingHandicap({ defaultIndex = null }) {
         />
         {defaultIndex != null && (
           <span style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
-            Pre-filled with your Pin High Number — overwrite it with your official index if you have one.
+            Pre-filled with your Pin High Number — overwrite it with your official number if you have one.
           </span>
         )}
       </label>
