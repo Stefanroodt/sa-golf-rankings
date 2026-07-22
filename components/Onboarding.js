@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-// First-visit tooltip tour. Shows once (localStorage flag), walks new
-// golfers through the hero: rate a course, scorecard, 19th holes.
-const KEY = 'ph-tour-v1';
-
-const STEPS = [
+// Tooltip tour. Shows once per storageKey (localStorage flag).
+// Default steps walk first-time visitors through the homepage hero;
+// pass custom steps + storageKey to run it elsewhere (e.g. the play hub).
+const HOME_STEPS = [
   {
     sel: null,
     title: 'Welcome to Pin High 👋',
@@ -36,29 +35,30 @@ const STEPS = [
   },
 ];
 
-export default function Onboarding() {
+export default function Onboarding({ steps = HOME_STEPS, storageKey = 'ph-tour-v1' }) {
   const [step, setStep] = useState(-1);
   const [rect, setRect] = useState(null);
   const raf = useRef(null);
 
-  // Start once per browser, after the page settles
+  // Start once per storageKey, after the page settles
   useEffect(() => {
+    if (!storageKey) return;
     try {
-      if (localStorage.getItem(KEY)) return;
+      if (localStorage.getItem(storageKey)) return;
     } catch { return; }
     const t = setTimeout(() => setStep(0), 900);
     return () => clearTimeout(t);
-  }, []);
+  }, [storageKey]);
 
   const finish = () => {
-    try { localStorage.setItem(KEY, '1'); } catch {}
+    try { localStorage.setItem(storageKey, '1'); } catch {}
     setStep(-2);
   };
 
   // Track the highlighted element's position
   useEffect(() => {
     if (step < 0) return;
-    const s = STEPS[step];
+    const s = steps[step];
     if (!s.sel) { setRect(null); return; }
     const el = document.querySelector(s.sel);
     if (!el) { setRect(null); return; }
@@ -80,11 +80,11 @@ export default function Onboarding() {
       window.removeEventListener('resize', onMove);
       window.removeEventListener('scroll', onMove, true);
     };
-  }, [step]);
+  }, [step, steps]);
 
   if (step < 0) return null;
-  const s = STEPS[step];
-  const last = step === STEPS.length - 1;
+  const s = steps[step];
+  const last = step === steps.length - 1;
 
   // Card position: under the spotlight if there's room, else above; centered otherwise
   let cardStyle = {};
@@ -123,7 +123,7 @@ export default function Onboarding() {
         </div>
         <div className="onb-foot">
           <span className="onb-dots">
-            {STEPS.map((_, i) => (
+            {steps.map((_, i) => (
               <span key={i} className={`onb-dot${i === step ? ' active' : ''}`} />
             ))}
           </span>
