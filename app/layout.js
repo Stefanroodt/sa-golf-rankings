@@ -1,6 +1,7 @@
 import './globals.css';
 import Nav from '../components/Nav';
 import InstallApp from '../components/InstallApp';
+import FeedbackButton from '../components/FeedbackForm';
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata = {
@@ -64,6 +65,7 @@ export default function RootLayout({ children }) {
               <a href="/19th-holes">19th Holes</a>
               <a href="/leaderboard">Leaderboard</a>
               <a href="/blog">Blog</a>
+              <FeedbackButton />
               <a href="/about">About</a>
               <a href="/privacy">Privacy</a>
             </div>

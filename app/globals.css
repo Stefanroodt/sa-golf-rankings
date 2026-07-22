@@ -651,3 +651,15 @@ footer {
   .stat-grid { gap: 7px; }
   .stat-value { font-size: 23px; }
 }
+
+/* Feedback button styled as a plain footer link */
+.footer-links { flex-wrap: wrap; }
+.footer-links .nav-feedback {
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--cream);
+}
+.footer-links .nav-feedback:hover { color: var(--gold); }
