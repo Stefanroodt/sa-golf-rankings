@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { HANDICAP_PREVIEW as ALLOW } from '../../lib/handicap';
+import { canSeeHandicap } from '../../lib/handicap';
 import ScoringStats from '../../components/ScoringStats';
 import PlayingHandicap from '../../components/PlayingHandicap';
 
@@ -30,7 +30,7 @@ export default function HandicapPage() {
     (async () => {
       const { data: u } = await supabase.auth.getUser();
       setUser(u.user);
-      if (!u.user || !ALLOW.includes(u.user.email)) return;
+      if (!u.user || !canSeeHandicap(u.user.email)) return;
       const { data: rds } = await supabase
         .from('rounds')
         .select('id, course_id, played_at, total_score, tee_name, course_rating, slope, holes_played, nine, courses(name, slug)')
@@ -115,7 +115,7 @@ export default function HandicapPage() {
     );
 
   // Preview gate — everyone except the allow-list sees "coming soon"
-  if (!ALLOW.includes(user.email))
+  if (!canSeeHandicap(user.email))
     return (
       <div className="container" style={{ maxWidth: 560, margin: '48px auto' }}>
         <div className="card" style={{ textAlign: 'center' }}>
