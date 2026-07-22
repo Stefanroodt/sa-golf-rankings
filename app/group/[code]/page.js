@@ -14,6 +14,7 @@ export default function GroupRound({ params }) {
   const [user, setUser] = useState(null);
   const [note, setNote] = useState(null);
   const [savedRound, setSavedRound] = useState(false);
+  const [view, setView] = useState('gross'); // gross | net | points
   const dirty = useRef({});   // playerId -> true while local edits not yet pushed
   const timers = useRef({});  // playerId -> debounce timer
 
@@ -31,7 +32,7 @@ export default function GroupRound({ params }) {
       if (!r) return;
       const [{ data: ps }, { data: sc }] = await Promise.all([
         supabase.from('group_players').select('*').eq('group_round_id', r.id).order('created_at'),
-        supabase.from('scorecards').select('hole, par').eq('course_id', r.course_id).order('hole'),
+        supabase.from('scorecards').select('hole, par, stroke_index').eq('course_id', r.course_id).order('hole'),
       ]);
       setPlayers(ps || []);
       setCard(sc || []);
@@ -84,21 +85,62 @@ export default function GroupRound({ params }) {
   }
 
   const parOf = useMemo(() => Object.fromEntries(card.map((h) => [h.hole, h.par])), [card]);
+  const siOf = useMemo(() => Object.fromEntries(card.map((h) => [h.hole, h.stroke_index])), [card]);
+  const hasSI = useMemo(() => card.length > 0 && card.every((h) => h.stroke_index), [card]);
+
+  // Strokes received on a hole for handicap H (standard SI allocation)
+  const strokesFor = (H, si) => {
+    if (H == null || !si) return 0;
+    if (H >= 0) return Math.floor(H / 18) + (si <= H % 18 ? 1 : 0);
+    return si > 18 + H ? -1 : 0;
+  };
 
   const board = useMemo(() => {
-    return players
-      .map((p) => {
-        let total = 0, thru = 0, par = 0;
-        for (const [h, v] of Object.entries(p.hole_scores || {})) {
-          const s = parseInt(v, 10);
-          if (s > 0 && parOf[h]) { total += s; par += parOf[h]; thru += 1; }
+    const rows = players.map((p) => {
+      let total = 0, thru = 0, par = 0, net = 0, pts = 0;
+      const H = Number.isInteger(p.handicap) ? p.handicap : null;
+      for (const [h, v] of Object.entries(p.hole_scores || {})) {
+        const s = parseInt(v, 10);
+        if (!(s > 0) || !parOf[h]) continue;
+        total += s; par += parOf[h]; thru += 1;
+        if (H != null && siOf[h]) {
+          const rec = strokesFor(H, siOf[h]);
+          net += s - rec;
+          pts += Math.max(0, 2 - (s - rec - parOf[h]));
         }
-        return { ...p, total, thru, toPar: total - par };
-      })
-      .sort((a, b) =>
-        (a.thru === 0) - (b.thru === 0) || a.toPar - b.toPar || b.thru - a.thru
+      }
+      const hasNet = H != null && hasSI;
+      return {
+        ...p, total, thru, toPar: total - par,
+        net: hasNet ? net : null,
+        netToPar: hasNet ? net - par : null,
+        pts: hasNet ? pts : null,
+      };
+    });
+    if (view === 'net')
+      return rows.sort((a, b) =>
+        (a.net == null) - (b.net == null) || (a.thru === 0) - (b.thru === 0) ||
+        (a.netToPar ?? 0) - (b.netToPar ?? 0) || b.thru - a.thru
       );
-  }, [players, parOf]);
+    if (view === 'points')
+      return rows.sort((a, b) =>
+        (a.pts == null) - (b.pts == null) || (b.pts ?? 0) - (a.pts ?? 0) || b.thru - a.thru
+      );
+    return rows.sort((a, b) =>
+      (a.thru === 0) - (b.thru === 0) || a.toPar - b.toPar || b.thru - a.thru
+    );
+  }, [players, parOf, siOf, hasSI, view]);
+
+  function setHandicap(p, val) {
+    const H = /^-?\d+$/.test(String(val).trim()) ? parseInt(val, 10) : null;
+    setPlayers((cur) => cur.map((x) => (x.id === p.id ? { ...x, handicap: H } : x)));
+    dirty.current[p.id] = true;
+    clearTimeout(timers.current['h' + p.id]);
+    timers.current['h' + p.id] = setTimeout(() => {
+      supabase.from('group_players').update({ handicap: H }).eq('id', p.id)
+        .then(() => { dirty.current[p.id] = false; });
+    }, 700);
+  }
 
   async function joinRound() {
     if (!user || !round || players.length >= 4) return;
@@ -171,29 +213,62 @@ export default function GroupRound({ params }) {
         </button>
       </div>
 
-      {/* Leaderboard — gross strokes */}
+      {/* Leaderboard — gross / net / points */}
       <div className="card" style={{ background: 'var(--green-deep)', color: 'var(--cream)' }}>
-        <h2 style={{ color: 'var(--cream)' }}>🏆 Leaderboard · gross</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+          <h2 style={{ color: 'var(--cream)', marginBottom: 0 }}>🏆 Leaderboard</h2>
+          <span className="grp-toggle">
+            {['gross', 'net', 'points'].map((m) => (
+              <button
+                key={m}
+                className={view === m ? 'active' : ''}
+                onClick={() => setView(m)}
+              >
+                {m === 'gross' ? 'Gross' : m === 'net' ? 'Net' : 'Points'}
+              </button>
+            ))}
+          </span>
+        </div>
         <div className="grp-row grp-head">
           <span />
           <span>Player</span>
           <span style={{ textAlign: 'right' }}>Thru</span>
-          <span style={{ textAlign: 'right' }}>Gross score</span>
-          <span style={{ textAlign: 'right' }}>To par</span>
+          <span style={{ textAlign: 'right' }}>
+            {view === 'points' ? 'Points' : view === 'net' ? 'Net score' : 'Gross score'}
+          </span>
+          <span style={{ textAlign: 'right' }}>{view === 'points' ? '' : 'To par'}</span>
         </div>
-        {board.map((p, i) => (
-          <div key={p.id} className="grp-row">
-            <span className="grp-pos">{p.thru === 0 ? '·' : i + 1}</span>
-            <span className="grp-name">
-              {p.name}{p.user_id === user?.id ? ' (you)' : ''}
-            </span>
-            <span className="grp-thru">{p.thru === 0 ? 'not started' : `thru ${p.thru}`}</span>
-            <span className="grp-gross">{p.thru === 0 ? '' : p.total}</span>
-            <span className={`grp-topar ${p.toPar > 0 ? 'over' : p.toPar < 0 ? 'under' : ''}`}>
-              {fmtPar(p.toPar, p.thru)}
-            </span>
-          </div>
-        ))}
+        {board.map((p, i) => {
+          const noNet = view !== 'gross' && p.net == null;
+          const val = view === 'points' ? p.pts : view === 'net' ? p.net : p.total;
+          const tp = view === 'net' ? p.netToPar : p.toPar;
+          return (
+            <div key={p.id} className="grp-row" style={noNet ? { opacity: 0.45 } : undefined}>
+              <span className="grp-pos">{p.thru === 0 || noNet ? '·' : i + 1}</span>
+              <span className="grp-name">
+                {p.name}{p.user_id === user?.id ? ' (you)' : ''}
+                {Number.isInteger(p.handicap) && <span className="grp-hc-tag"> HC {p.handicap}</span>}
+              </span>
+              <span className="grp-thru">{p.thru === 0 ? 'not started' : `thru ${p.thru}`}</span>
+              <span className="grp-gross">
+                {p.thru === 0 ? '' : noNet ? '—' : val}
+              </span>
+              <span className={`grp-topar ${tp > 0 ? 'over' : tp < 0 ? 'under' : ''}`}>
+                {view === 'points' || noNet ? '' : fmtPar(tp, p.thru)}
+              </span>
+            </div>
+          );
+        })}
+        {view !== 'gross' && !hasSI && (
+          <p className="notice" style={{ color: '#9db8aa', marginTop: 8 }}>
+            Net &amp; points need a stroke index for this course — not available here yet.
+          </p>
+        )}
+        {view !== 'gross' && hasSI && board.some((p) => p.net == null) && (
+          <p className="notice" style={{ color: '#9db8aa', marginTop: 8 }}>
+            Faded players have no handicap set — add it under their name in the scores grid.
+          </p>
+        )}
       </div>
 
       {user && !myPlayer && players.length < 4 && round.status === 'live' && (
@@ -225,12 +300,34 @@ export default function GroupRound({ params }) {
                   <th key={p.id}>{p.name.split(' ')[0]}</th>
                 ))}
               </tr>
+              <tr>
+                <th className="grp-hole-h" style={{ fontWeight: 400 }}>Handicap</th>
+                {players.map((p) => (
+                  <th key={p.id}>
+                    {canEdit(p) ? (
+                      <input
+                        className="grp-hc"
+                        type="number"
+                        inputMode="numeric"
+                        placeholder="HC"
+                        value={Number.isInteger(p.handicap) ? p.handicap : ''}
+                        onChange={(e) => setHandicap(p, e.target.value)}
+                      />
+                    ) : (
+                      <span style={{ fontWeight: 400 }}>
+                        {Number.isInteger(p.handicap) ? p.handicap : '—'}
+                      </span>
+                    )}
+                  </th>
+                ))}
+              </tr>
             </thead>
             <tbody>
               {card.map((h) => (
                 <tr key={h.hole}>
                   <td className="grp-hole">
-                    <strong>{h.hole}</strong> <span className="meta-sub">Par {h.par}</span>
+                    <strong>{h.hole}</strong>{' '}
+                    <span className="meta-sub">Par {h.par}{h.stroke_index ? ` · S${h.stroke_index}` : ''}</span>
                   </td>
                   {players.map((p) => (
                     <td key={p.id}>

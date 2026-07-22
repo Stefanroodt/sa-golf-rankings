@@ -17,6 +17,8 @@ export default function GroupStart() {
   const [q, setQ] = useState('');
   const [course, setCourse] = useState(null);
   const [names, setNames] = useState(['', '', '']);
+  const [hcps, setHcps] = useState(['', '', '']);
+  const [myHcp, setMyHcp] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
@@ -62,13 +64,14 @@ export default function GroupStart() {
       return;
     }
 
+    const toHcp = (v) => (/^-?\d+$/.test(String(v).trim()) ? parseInt(v, 10) : null);
     const players = [
-      { group_round_id: round.id, name: myName, user_id: user.id },
+      { group_round_id: round.id, name: myName, user_id: user.id, handicap: toHcp(myHcp) },
       ...names
-        .map((n) => n.trim())
-        .filter(Boolean)
+        .map((n, i) => ({ name: n.trim(), handicap: toHcp(hcps[i]) }))
+        .filter((p) => p.name)
         .slice(0, 3)
-        .map((n) => ({ group_round_id: round.id, name: n })),
+        .map((p) => ({ group_round_id: round.id, name: p.name, handicap: p.handicap })),
     ];
     await supabase.from('group_players').insert(players);
     router.push(`/group/${round.code}`);
@@ -131,16 +134,37 @@ export default function GroupStart() {
             ))}
 
             <p className="notice" style={{ margin: '10px 0 6px' }}>
-              Your fourball — you&apos;re in automatically. Add up to three mates (no account needed):
+              Your fourball — you&apos;re in automatically. Add up to three mates (no account needed).
+              Handicaps are optional — they unlock the net &amp; points leaderboards.
             </p>
-            {names.map((n, i) => (
+            <div style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'center' }}>
+              <span style={{ width: 'min(300px, 60%)', fontSize: 15, fontWeight: 700 }}>You</span>
               <input
-                key={i}
-                value={n}
-                placeholder={`Player ${i + 2} name`}
-                onChange={(e) => setNames((s) => s.map((x, j) => (j === i ? e.target.value : x)))}
-                style={{ display: 'block', width: 'min(300px, 100%)', marginBottom: 6, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
+                value={myHcp}
+                type="number"
+                inputMode="numeric"
+                placeholder="HC"
+                onChange={(e) => setMyHcp(e.target.value)}
+                style={{ width: 70, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
               />
+            </div>
+            {names.map((n, i) => (
+              <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+                <input
+                  value={n}
+                  placeholder={`Player ${i + 2} name`}
+                  onChange={(e) => setNames((s) => s.map((x, j) => (j === i ? e.target.value : x)))}
+                  style={{ width: 'min(300px, 60%)', padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
+                />
+                <input
+                  value={hcps[i]}
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="HC"
+                  onChange={(e) => setHcps((s) => s.map((x, j) => (j === i ? e.target.value : x)))}
+                  style={{ width: 70, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
+                />
+              </div>
             ))}
 
             <button className="btn btn-gold" style={{ marginTop: 10 }} onClick={start} disabled={!course || busy}>

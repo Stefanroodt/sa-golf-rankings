@@ -842,3 +842,45 @@ footer {
   letter-spacing: 1px;
   font-size: 11px;
 }
+
+/* Group leaderboard view toggle + handicap inputs */
+.grp-toggle {
+  display: inline-flex;
+  background: rgba(247, 243, 233, 0.1);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+}
+.grp-toggle button {
+  background: none;
+  border: none;
+  color: #cfe0d5;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.grp-toggle button.active {
+  background: var(--gold);
+  color: var(--green-deep);
+}
+.grp-hc {
+  width: 52px;
+  min-height: 36px;
+  text-align: center;
+  padding: 4px;
+  border: 1px solid var(--cream-dark);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  background: #fff;
+}
+.grp-hc-tag {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9db8aa;
+  margin-left: 4px;
+}
