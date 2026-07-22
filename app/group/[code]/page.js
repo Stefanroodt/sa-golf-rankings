@@ -174,6 +174,13 @@ export default function GroupRound({ params }) {
       {/* Leaderboard — gross strokes */}
       <div className="card" style={{ background: 'var(--green-deep)', color: 'var(--cream)' }}>
         <h2 style={{ color: 'var(--cream)' }}>🏆 Leaderboard · gross</h2>
+        <div className="grp-row grp-head">
+          <span />
+          <span>Player</span>
+          <span style={{ textAlign: 'right' }}>Thru</span>
+          <span style={{ textAlign: 'right' }}>Gross score</span>
+          <span style={{ textAlign: 'right' }}>To par</span>
+        </div>
         {board.map((p, i) => (
           <div key={p.id} className="grp-row">
             <span className="grp-pos">{p.thru === 0 ? '·' : i + 1}</span>
