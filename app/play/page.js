@@ -19,6 +19,11 @@ const HUB_STEPS = [
     text: 'Real hole-by-hole scorecards for 170+ courses. Track every round and see your best at each course.',
   },
   {
+    sel: '.hub-btn-group',
+    title: 'Play a group round 👥',
+    text: 'One scorer captures the whole fourball. Share the code and everyone follows a live leaderboard — gross, net &amp; Stableford points, updating shot by shot.',
+  },
+  {
     sel: '.hub-menu a[href="/"]',
     title: 'Rate the courses you play ★',
     text: 'Score them on condition, greens, layout, value and more. Every rating moves the national rankings — and earns you badges.',
@@ -54,7 +59,7 @@ export default function PlayHub() {
 
   return (
     <div className="container hub-wrap">
-      {uid && <Onboarding steps={HUB_STEPS} storageKey={`ph-hub-tour-${uid}`} />}
+      {uid && <Onboarding steps={HUB_STEPS} storageKey={`ph-hub-tour-v2-${uid}`} />}
       <h1 className="hub-title">{name ? `Welcome back, ${name}.` : 'Welcome to Pin High.'}</h1>
       <p className="hub-sub">What are we doing today?</p>
 
@@ -62,6 +67,11 @@ export default function PlayHub() {
         <Link href="/scorecard" className="hub-btn">
           <span className="hub-btn-title">Scorecard</span>
           <span className="hub-btn-sub">Start scoring your round</span>
+        </Link>
+
+        <Link href="/group" className="hub-btn hub-btn-group">
+          <span className="hub-btn-title">Group round 👥</span>
+          <span className="hub-btn-sub">Score a fourball · live leaderboard</span>
         </Link>
 
         <Link href="/" className="hub-btn">
