@@ -69,7 +69,7 @@ export default function Nav() {
         <div className="nav-links">
           <Link href="/">Rankings</Link>
           <Link href="/scorecard">Scorecard</Link>
-          {user && canSeeHandicap(user.email) && <Link href="/handicap">Handicap</Link>}
+          {user && canSeeHandicap(user.email) && <Link href="/handicap">Pin High Number</Link>}
           {user ? (
             <>
               <span className="nav-user-wrap">
@@ -94,7 +94,7 @@ export default function Nav() {
                       </Link>
                       {canSeeHandicap(user.email) && (
                         <Link href="/handicap" className="chip" onClick={() => setMenuOpen(false)}>
-                          🏌️ Handicap
+                          🏌️ Pin High Number
                         </Link>
                       )}
                     </span>

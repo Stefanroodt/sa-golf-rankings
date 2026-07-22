@@ -37,13 +37,13 @@ export default function PlayHub() {
 
         {canHandicap ? (
           <Link href="/handicap" className="hub-btn">
-            <span className="hub-btn-title">Handicap</span>
-            <span className="hub-btn-sub">Your Pin High Number — preview</span>
+            <span className="hub-btn-title">Pin High Number</span>
+            <span className="hub-btn-sub">Your handicap — preview</span>
           </Link>
         ) : (
           <span className="hub-btn hub-btn-soon" aria-disabled="true">
-            <span className="hub-btn-title">Handicap</span>
-            <span className="hub-btn-sub">Your Pin High index — coming soon</span>
+            <span className="hub-btn-title">Pin High Number</span>
+            <span className="hub-btn-sub">Your handicap — coming soon</span>
           </span>
         )}
       </div>
