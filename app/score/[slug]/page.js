@@ -27,7 +27,7 @@ export default async function ScorePage({ params, searchParams }) {
         className="back-link"
         style={{ display: 'inline-block', marginBottom: 14 }}
       >
-        {fromHandicap ? '← Your handicap' : '← All scorecards'}
+        {fromHandicap ? '← Your Pin High Number' : '← All scorecards'}
       </Link>
       <h1 style={{ fontSize: 24, marginBottom: 2 }}>{course.name}</h1>
       <div className="meta-sub" style={{ marginBottom: 16 }}>

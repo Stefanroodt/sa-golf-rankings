@@ -95,8 +95,8 @@ export default function HandicapPage() {
         <div className="card" style={{ textAlign: 'center' }}>
           <h2>🏌️ Pin High Number</h2>
           <p className="notice" style={{ marginTop: 8 }}>
-            Your unofficial Pin High handicap — coming soon. Keep logging your rounds and it will be
-            ready to calculate the moment it launches.
+            One reliable number that tracks your game — coming soon. Keep logging your rounds and
+            it will be ready to calculate the moment it launches.
           </p>
           <Link href="/scorecard" className="btn btn-gold" style={{ marginTop: 14 }}>Log a round →</Link>
         </div>

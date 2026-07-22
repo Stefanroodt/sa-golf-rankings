@@ -26,7 +26,7 @@ const HUB_STEPS = [
   {
     sel: '.hub-btn-handicap',
     title: 'Your Pin High Number 🏌️',
-    text: 'A handicap built from your logged rounds using official course ratings. Log 3 rounds and your number appears.',
+    text: 'One reliable number that tracks your game, built from your logged rounds using official course ratings. Log 3 rounds and your number appears.',
   },
   {
     sel: '.played-pill',
@@ -72,12 +72,12 @@ export default function PlayHub() {
         {canHandicap ? (
           <Link href="/handicap" className="hub-btn hub-btn-handicap">
             <span className="hub-btn-title">Pin High Number</span>
-            <span className="hub-btn-sub">Your handicap — preview</span>
+            <span className="hub-btn-sub">The number that tracks your game — preview</span>
           </Link>
         ) : (
           <span className="hub-btn hub-btn-soon hub-btn-handicap" aria-disabled="true">
             <span className="hub-btn-title">Pin High Number</span>
-            <span className="hub-btn-sub">Your handicap — coming soon</span>
+            <span className="hub-btn-sub">The number that tracks your game — coming soon</span>
           </span>
         )}
       </div>
