@@ -9,8 +9,18 @@ export default function NumberBanner() {
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [hidden, setHidden] = useState(true);
   const [err, setErr] = useState(null);
   const [uid, setUid] = useState(null);
+
+  // Hide permanently once they've signed up (flag set on success)
+  useEffect(() => {
+    try {
+      setHidden(!!localStorage.getItem('ph-number-interest'));
+    } catch {
+      setHidden(false);
+    }
+  }, []);
 
   // Prefill for signed-in golfers
   useEffect(() => {
@@ -38,8 +48,11 @@ export default function NumberBanner() {
       setErr('Could not save that — try again.');
       return;
     }
+    try { localStorage.setItem('ph-number-interest', '1'); } catch {}
     setDone(true);
   }
+
+  if (hidden) return null;
 
   return (
     <div className="number-banner">
