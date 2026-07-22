@@ -329,20 +329,33 @@ export default function GroupRound({ params }) {
                     <strong>{h.hole}</strong>{' '}
                     <span className="meta-sub">Par {h.par}{h.stroke_index ? ` · S${h.stroke_index}` : ''}</span>
                   </td>
-                  {players.map((p) => (
-                    <td key={p.id}>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        min="1"
-                        max="15"
-                        placeholder={h.par}
-                        disabled={!canEdit(p)}
-                        value={p.hole_scores?.[h.hole] ?? ''}
-                        onChange={(e) => setScore(p, h.hole, e.target.value)}
-                      />
-                    </td>
-                  ))}
+                  {players.map((p) => {
+                    const s = parseInt(p.hole_scores?.[h.hole], 10);
+                    const H = Number.isInteger(p.handicap) ? p.handicap : null;
+                    let pts = null;
+                    if (s > 0 && H != null && h.stroke_index) {
+                      pts = Math.max(0, 2 - (s - strokesFor(H, h.stroke_index) - h.par));
+                    }
+                    return (
+                      <td key={p.id}>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          max="15"
+                          placeholder={h.par}
+                          disabled={!canEdit(p)}
+                          value={p.hole_scores?.[h.hole] ?? ''}
+                          onChange={(e) => setScore(p, h.hole, e.target.value)}
+                        />
+                        {pts != null && (
+                          <span className={`grp-pts ${pts >= 3 ? 'good' : pts === 0 ? 'blob' : ''}`}>
+                            {pts} pt{pts === 1 ? '' : 's'}
+                          </span>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

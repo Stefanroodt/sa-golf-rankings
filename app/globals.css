@@ -884,3 +884,14 @@ footer {
   color: #9db8aa;
   margin-left: 4px;
 }
+
+/* Per-hole Stableford points under each score cell */
+.grp-pts {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.grp-pts.good { color: var(--gold); }
+.grp-pts.blob { color: #a05a4b; }
