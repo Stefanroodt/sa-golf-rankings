@@ -33,7 +33,7 @@ export default function HandicapPage() {
       if (!u.user || !ALLOW.includes(u.user.email)) return;
       const { data: rds } = await supabase
         .from('rounds')
-        .select('id, course_id, played_at, total_score, tee_name, course_rating, slope, courses(name, slug)')
+        .select('id, course_id, played_at, total_score, tee_name, course_rating, slope, holes_played, nine, courses(name, slug)')
         .eq('user_id', u.user.id)
         .order('played_at', { ascending: false })
         .order('created_at', { ascending: false })
@@ -52,18 +52,44 @@ export default function HandicapPage() {
     })();
   }, []);
 
+  // 18-hole differential for one round.
+  //  18 holes: (score − CR) × 113 ÷ slope.
+  //  9 holes:  a 9-hole differential from half the CR + same slope, plus an
+  //            expected 9-hole differential (≈ half the player's current number)
+  //            for the nine they didn't play — WHS logic without per-nine ratings.
+  //  Fallback (no rating): score − par (18), or 2 × (9-hole score − half par).
+  const round1 = (n) => Math.round(n * 10) / 10;
+  function diffFor(r, provIndex) {
+    const nine = r.holes_played === 9;
+    if (r.course_rating && r.slope) {
+      if (!nine) return round1((r.total_score - Number(r.course_rating)) * 113 / r.slope);
+      const nineDiff = (r.total_score - Number(r.course_rating) / 2) * 113 / r.slope;
+      const expected = provIndex != null ? provIndex / 2 : nineDiff; // last resort: mirror the played nine
+      return round1(nineDiff + expected);
+    }
+    const par = parByCourse[r.course_id];
+    if (par && par >= 66 && par <= 74) {
+      return nine ? round1(2 * (r.total_score - par / 2)) : r.total_score - par;
+    }
+    return null;
+  }
+
   const calc = useMemo(() => {
-    // WHS-style differential where we have course rating + slope for the tee played:
-    //   diff = (score - course rating) * 113 / slope
-    // Otherwise fall back to a simple score-minus-par differential.
+    // First pass: a provisional number from 18-hole rounds only, used to estimate
+    // the unplayed nine of any 9-hole rounds.
+    const eighteen = rounds.filter((r) => r.holes_played !== 9)
+      .map((r) => diffFor(r, null)).filter((d) => d != null).sort((a, b) => a - b);
+    const provIndex = (() => {
+      const last20 = eighteen.slice(0, 20); // already low-first, fine for an average
+      const kk = bestCount(rounds.filter((r) => r.holes_played !== 9).length > 20 ? 20 : eighteen.length);
+      if (!kk) return null;
+      return round1(eighteen.slice(0, kk).reduce((s, x) => s + x, 0) / kk);
+    })();
+
     const diffs = rounds
       .map((r) => {
-        if (r.course_rating && r.slope) {
-          return { ...r, diff: Math.round(((r.total_score - Number(r.course_rating)) * 113 / r.slope) * 10) / 10, whs: true };
-        }
-        const par = parByCourse[r.course_id];
-        if (par && par >= 66 && par <= 74) return { ...r, diff: r.total_score - par, whs: false };
-        return null;
+        const diff = diffFor(r, provIndex);
+        return diff == null ? null : { ...r, diff, whs: !!(r.course_rating && r.slope) };
       })
       .filter(Boolean);
     const last20 = diffs.slice(0, 20);
@@ -72,7 +98,7 @@ export default function HandicapPage() {
     const index = k ? Math.round((best.reduce((s, x) => s + x.diff, 0) / k) * 10) / 10 : null;
     const bestIds = new Set(best.map((x) => x.id));
     return { diffs, last20, k, index, bestIds };
-  }, [rounds, parByCourse]);
+  }, [rounds, parByCourse]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (user === undefined)
     return <div className="container"><p className="notice" style={{ margin: '40px 0' }}>Loading…</p></div>;
@@ -150,6 +176,7 @@ export default function HandicapPage() {
                       {r.courses.name}
                     </Link>
                     {r.tee_name && <span className="meta-sub"> · {r.tee_name}</span>}
+                    {r.holes_played === 9 && <span className="meta-sub"> · 9 holes</span>}
                     {calc.bestIds.has(r.id) && <span className="badge badge-played" style={{ marginLeft: 6 }}>counted</span>}
                   </td>
                   <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--muted)' }}>

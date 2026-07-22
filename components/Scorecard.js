@@ -22,9 +22,9 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
   const [tees, setTees] = useState([]);
   const [teeIdx, setTeeIdx] = useState('');
   const [hcp, setHcp] = useState('');
+  const [mode, setMode] = useState('full'); // full | front | back
   const wrapRef = useRef(null);
 
-  // Arriving from the Scorecard hub (/course/slug?score=1): open entry and scroll to it
   useEffect(() => {
     if (autoOpen) {
       setEntryOpen(true);
@@ -34,26 +34,41 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
   }, [autoOpen]);
 
   const hasCard = scorecard.length >= 9;
+  const is18 = scorecard.length >= 18;
   const coursePar = useMemo(
     () => (hasCard ? scorecard.reduce((s, h) => s + h.par, 0) : null),
     [scorecard, hasCard]
   );
+
+  // The holes being scored right now — full card, or one nine of an 18-hole course
+  const activeCard = useMemo(() => {
+    if (mode === 'front') return scorecard.filter((h) => h.hole <= 9);
+    if (mode === 'back') return scorecard.filter((h) => h.hole >= 10);
+    return scorecard;
+  }, [scorecard, mode]);
+
   const hasSI = useMemo(
-    () => hasCard && scorecard.every((h) => h.stroke_index),
-    [scorecard, hasCard]
+    () => hasCard && activeCard.length > 0 && activeCard.every((h) => h.stroke_index),
+    [activeCard, hasCard]
   );
   const hcpNum = /^-?\d+$/.test(hcp.trim()) ? parseInt(hcp, 10) : null;
 
-  // Strokes received on a hole for the entered playing handicap:
-  // everyone gets floor(H/18) on every hole, plus 1 more where SI <= H % 18.
-  // Plus (negative) handicaps give a stroke back on the easiest holes.
+  // Strokes received on a hole. Over 9 holes a player gets ~half their handicap,
+  // so we scale the divisor to the number of holes being scored.
+  const scoringHoles = activeCard.length || 18;
   const strokesFor = (si) => {
     if (hcpNum == null || !si) return 0;
-    if (hcpNum >= 0) {
-      return Math.floor(hcpNum / 18) + (si <= hcpNum % 18 ? 1 : 0);
-    }
-    return si > 18 + hcpNum ? -1 : 0; // e.g. +2 gives back on SI 17 & 18
+    const H = mode === 'full' ? hcpNum : Math.round(hcpNum / 2); // half strokes on a nine
+    if (H >= 0) return Math.floor(H / scoringHoles) + (siRank(si) <= H % scoringHoles ? 1 : 0);
+    return siRank(si) > scoringHoles + H ? -1 : 0;
   };
+  // Rank the played holes' stroke indexes 1..N so a nine allocates cleanly
+  const siRank = useMemo(() => {
+    const order = [...activeCard].filter((h) => h.stroke_index).sort((a, b) => a.stroke_index - b.stroke_index);
+    const map = {};
+    order.forEach((h, i) => { map[h.stroke_index] = i + 1; });
+    return (si) => map[si] || si;
+  }, [activeCard]);
 
   useEffect(() => {
     (async () => {
@@ -64,7 +79,6 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
         .order('course_rating', { ascending: false });
       const ts = teeData || [];
       setTees(ts);
-      // Default to men's White, else first men's, else first
       if (ts.length) {
         const def = ts.findIndex((t) => t.gender === 'M' && /white/i.test(t.tee));
         const men = ts.findIndex((t) => t.gender === 'M');
@@ -75,7 +89,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
       if (!u.user) return;
       const [{ data: r }, { data: rd }] = await Promise.all([
         supabase.from('ratings').select('id').eq('user_id', u.user.id).eq('course_id', course.id).limit(1),
-        supabase.from('rounds').select('id, played_at, total_score, hole_scores')
+        supabase.from('rounds').select('id, played_at, total_score, hole_scores, holes_played, nine')
           .eq('user_id', u.user.id).eq('course_id', course.id)
           .order('played_at', { ascending: false }).limit(30),
       ]);
@@ -84,7 +98,6 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
     })();
   }, [course.id]);
 
-  // Unlock history live when they rate via the panel on the same page
   useEffect(() => {
     const onRated = () => setHasRated(true);
     window.addEventListener('pinhigh:rated', onRated);
@@ -92,26 +105,24 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
   }, []);
 
   const holesTotal = useMemo(
-    () => Object.values(holes).reduce((s, v) => s + (parseInt(v, 10) || 0), 0),
-    [holes]
+    () => activeCard.reduce((s, h) => s + (parseInt(holes[h.hole], 10) || 0), 0),
+    [holes, activeCard]
   );
   const holesFilled = useMemo(
-    () => Object.values(holes).filter((v) => parseInt(v, 10) > 0).length,
-    [holes]
+    () => activeCard.filter((h) => parseInt(holes[h.hole], 10) > 0).length,
+    [holes, activeCard]
   );
-  // Par of the holes filled so far, so the running score-to-par makes sense
   const filledPar = useMemo(
-    () => scorecard.reduce((s, h) => s + (parseInt(holes[h.hole], 10) > 0 ? h.par : 0), 0),
-    [holes, scorecard]
+    () => activeCard.reduce((s, h) => s + (parseInt(holes[h.hole], 10) > 0 ? h.par : 0), 0),
+    [holes, activeCard]
   );
   const toPar = holesTotal - filledPar;
   const toParStr = toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : `${toPar}`;
 
-  // Net + Stableford over the holes filled so far (needs SI + a playing handicap)
   const netStats = useMemo(() => {
     if (!hasSI || hcpNum == null) return null;
     let net = 0, pts = 0;
-    for (const h of scorecard) {
+    for (const h of activeCard) {
       const score = parseInt(holes[h.hole], 10);
       if (!(score > 0)) continue;
       const rec = strokesFor(h.stroke_index);
@@ -119,14 +130,15 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
       pts += Math.max(0, 2 - (score - rec - h.par));
     }
     return { net, pts };
-  }, [holes, scorecard, hasSI, hcpNum]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [holes, activeCard, hasSI, hcpNum]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function saveRound() {
     if (!user) return;
-    const usingHoles = hasCard && holesFilled === scorecard.length;
+    const usingHoles = hasCard && activeCard.length > 0 && holesFilled === activeCard.length;
     const score = usingHoles ? holesTotal : parseInt(total, 10);
-    if (!score || score < 18 || score > 200) {
-      setNote('Enter a valid total score (18–200).');
+    const minScore = mode === 'full' ? 18 : 9;
+    if (!score || score < minScore || score > 200) {
+      setNote(`Enter a valid total score (${minScore}–200).`);
       return;
     }
     setBusy(true);
@@ -137,8 +149,10 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
       course_id: course.id,
       played_at: playedAt,
       total_score: score,
+      holes_played: mode === 'full' ? 18 : 9,
+      nine: mode === 'full' ? null : mode,
       hole_scores: usingHoles
-        ? Object.fromEntries(scorecard.map((h) => [h.hole, parseInt(holes[h.hole], 10)]))
+        ? Object.fromEntries(activeCard.map((h) => [h.hole, parseInt(holes[h.hole], 10)]))
         : null,
       tee_name: tee ? tee.tee : null,
       course_rating: tee ? tee.course_rating : null,
@@ -159,9 +173,8 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
     setTotal('');
     setEntryOpen(false);
     setNote(hasRated ? 'Round saved.' : 'Round saved — rate this course to see your scoring history.');
-    // refresh history
     const { data: rd } = await supabase.from('rounds')
-      .select('id, played_at, total_score, hole_scores')
+      .select('id, played_at, total_score, hole_scores, holes_played, nine')
       .eq('user_id', user.id).eq('course_id', course.id)
       .order('played_at', { ascending: false }).limit(30);
     setRounds(rd || []);
@@ -173,7 +186,9 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
     setRounds((r) => (r || []).filter((x) => x.id !== id));
   }
 
-  const best = rounds && rounds.length ? Math.min(...rounds.map((r) => r.total_score)) : null;
+  // Best 18-hole score at this course (9-hole rounds aren't comparable)
+  const full18 = (rounds || []).filter((r) => r.holes_played !== 9);
+  const best = full18.length ? Math.min(...full18.map((r) => r.total_score)) : null;
 
   return (
     <div className="card" ref={wrapRef}>
@@ -214,6 +229,20 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                 />
               </label>
 
+              {is18 && (
+                <div className="holes-switch" role="tablist" aria-label="Holes played">
+                  {[['full', '18 holes'], ['front', 'Front 9'], ['back', 'Back 9']].map(([m, label]) => (
+                    <button
+                      key={m}
+                      className={mode === m ? 'active' : ''}
+                      onClick={() => { setMode(m); setHoles({}); setTotal(''); }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {tees.length > 0 && (
                 <label className="notice" style={{ display: 'block', marginBottom: 8 }}>
                   Tees played{' '}
@@ -229,7 +258,9 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                     ))}
                   </select>
                   <span style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
-                    Course rating &amp; slope for this tee — used for your Pin High Number.
+                    {mode === 'full'
+                      ? 'Course rating & slope for this tee — used for your Pin High Number.'
+                      : 'For a nine we use half the course rating and the same slope — your Number counts it as an 18-hole equivalent.'}
                   </span>
                 </label>
               )}
@@ -248,8 +279,8 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                     style={{ marginLeft: 6, width: 80, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
                   />
                   <span style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
-                    Optional — adds your net score and Stableford points as you go, using each
-                    hole&apos;s stroke index.
+                    Optional — adds your net score and Stableford points as you go
+                    {mode !== 'full' ? ' (half strokes over nine holes)' : ''}.
                   </span>
                 </label>
               )}
@@ -257,7 +288,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
               {hasCard ? (
                 <>
                   <div className="holes-grid">
-                    {scorecard.map((h) => (
+                    {activeCard.map((h) => (
                       <label key={h.hole} className="hole-cell">
                         <span className="hole-num">{h.hole}</span>
                         <span className="hole-par">
@@ -280,7 +311,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                   </div>
                   <div className="run-total">
                     <span className="run-total-label">
-                      Running total · {holesFilled}/{scorecard.length} holes
+                      Running total · {holesFilled}/{activeCard.length} holes
                     </span>
                     <span className="run-total-value">
                       {holesTotal || 0}
@@ -297,7 +328,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                       <span>Stableford <strong>{netStats.pts} pts</strong></span>
                     </div>
                   )}
-                  {holesFilled < scorecard.length && (
+                  {holesFilled < activeCard.length && (
                     <p className="notice" style={{ margin: '4px 0 0' }}>
                       Fill every hole for a full card, or just enter your total below.
                     </p>
@@ -305,16 +336,16 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                 </>
               ) : null}
 
-              {(!hasCard || holesFilled !== scorecard.length) && (
+              {(!hasCard || holesFilled !== activeCard.length) && (
                 <label className="notice" style={{ display: 'block', margin: '6px 0' }}>
-                  Total score{' '}
+                  Total score{mode !== 'full' ? ' (9 holes)' : ''}{' '}
                   <input
                     type="number"
                     inputMode="numeric"
-                    min="18"
+                    min={mode === 'full' ? 18 : 9}
                     max="200"
                     value={total}
-                    placeholder="e.g. 87"
+                    placeholder={mode === 'full' ? 'e.g. 87' : 'e.g. 44'}
                     onChange={(e) => setTotal(e.target.value)}
                     style={{ marginLeft: 6, width: 96, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
                   />
@@ -339,22 +370,29 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                 <p className="notice" style={{ fontWeight: 700, marginBottom: 6 }}>
                   Your rounds here{best ? ` · best: ${best}${coursePar ? ` (${best - coursePar >= 0 ? '+' : ''}${best - coursePar})` : ''}` : ''}
                 </p>
-                {rounds.map((r) => (
-                  <div key={r.id} className="review" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span>
-                      <strong>{r.total_score}</strong>
-                      {coursePar ? <span className="meta-sub"> ({r.total_score - coursePar >= 0 ? '+' : ''}{r.total_score - coursePar})</span> : null}
-                      {r.total_score === best && <span className="badge badge-played" style={{ marginLeft: 8 }}>Best</span>}
-                    </span>
-                    <span className="meta-sub">
-                      {new Date(r.played_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      {' · '}
-                      <button onClick={() => deleteRound(r.id)} style={{ background: 'none', border: 'none', color: 'var(--muted)', textDecoration: 'underline', cursor: 'pointer', fontSize: 12, padding: 0 }}>
-                        delete
-                      </button>
-                    </span>
-                  </div>
-                ))}
+                {rounds.map((r) => {
+                  const nine = r.holes_played === 9;
+                  return (
+                    <div key={r.id} className="review" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <span>
+                        <strong>{r.total_score}</strong>
+                        {nine ? (
+                          <span className="meta-sub"> · 9 holes{r.nine ? ` (${r.nine})` : ''}</span>
+                        ) : coursePar ? (
+                          <span className="meta-sub"> ({r.total_score - coursePar >= 0 ? '+' : ''}{r.total_score - coursePar})</span>
+                        ) : null}
+                        {!nine && r.total_score === best && <span className="badge badge-played" style={{ marginLeft: 8 }}>Best</span>}
+                      </span>
+                      <span className="meta-sub">
+                        {new Date(r.played_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {' · '}
+                        <button onClick={() => deleteRound(r.id)} style={{ background: 'none', border: 'none', color: 'var(--muted)', textDecoration: 'underline', cursor: 'pointer', fontSize: 12, padding: 0 }}>
+                          delete
+                        </button>
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="notice" style={{ marginTop: 14, borderLeft: '3px solid var(--gold)', paddingLeft: 10 }}>

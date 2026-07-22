@@ -935,3 +935,29 @@ footer {
   .hole-par { font-size: 10px; letter-spacing: 0; }
   .hole-dots { font-size: 9px; letter-spacing: 0.5px; }
 }
+
+/* 18 / Front 9 / Back 9 switch on the scorecard entry */
+.holes-switch {
+  display: inline-flex;
+  background: var(--cream);
+  border: 1px solid var(--cream-dark);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+.holes-switch button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.holes-switch button.active {
+  background: var(--green-deep);
+  color: var(--cream);
+}

@@ -19,7 +19,7 @@ export default function MyScores() {
       const [{ data: rds }, { data: rts }] = await Promise.all([
         supabase
           .from('rounds')
-          .select('id, course_id, played_at, total_score, courses(name, slug)')
+          .select('id, course_id, played_at, total_score, holes_played, nine, courses(name, slug)')
           .eq('user_id', u.user.id)
           .order('played_at', { ascending: false })
           .order('created_at', { ascending: false })
@@ -38,6 +38,7 @@ export default function MyScores() {
   const locked = rounds.length - visible.length;
   const best = {};
   for (const r of visible) {
+    if (r.holes_played === 9) continue; // 9-hole scores aren't comparable to 18
     if (!best[r.course_id] || r.total_score < best[r.course_id]) best[r.course_id] = r.total_score;
   }
 
@@ -60,6 +61,7 @@ export default function MyScores() {
                   <Link href={`/course/${r.courses.slug}`} style={{ textDecoration: 'underline' }}>
                     {r.courses.name}
                   </Link>
+                  {r.holes_played === 9 && <span className="meta-sub"> · 9{r.nine ? ` (${r.nine})` : ''}</span>}
                 </td>
                 <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--muted)' }}>
                   {new Date(r.played_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
