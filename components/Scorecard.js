@@ -21,6 +21,7 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
   const [entryOpen, setEntryOpen] = useState(false);
   const [tees, setTees] = useState([]);
   const [teeIdx, setTeeIdx] = useState('');
+  const [hcp, setHcp] = useState('');
   const wrapRef = useRef(null);
 
   // Arriving from the Scorecard hub (/course/slug?score=1): open entry and scroll to it
@@ -37,6 +38,22 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
     () => (hasCard ? scorecard.reduce((s, h) => s + h.par, 0) : null),
     [scorecard, hasCard]
   );
+  const hasSI = useMemo(
+    () => hasCard && scorecard.every((h) => h.stroke_index),
+    [scorecard, hasCard]
+  );
+  const hcpNum = /^-?\d+$/.test(hcp.trim()) ? parseInt(hcp, 10) : null;
+
+  // Strokes received on a hole for the entered playing handicap:
+  // everyone gets floor(H/18) on every hole, plus 1 more where SI <= H % 18.
+  // Plus (negative) handicaps give a stroke back on the easiest holes.
+  const strokesFor = (si) => {
+    if (hcpNum == null || !si) return 0;
+    if (hcpNum >= 0) {
+      return Math.floor(hcpNum / 18) + (si <= hcpNum % 18 ? 1 : 0);
+    }
+    return si > 18 + hcpNum ? -1 : 0; // e.g. +2 gives back on SI 17 & 18
+  };
 
   useEffect(() => {
     (async () => {
@@ -90,6 +107,20 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
   const toPar = holesTotal - filledPar;
   const toParStr = toPar === 0 ? 'E' : toPar > 0 ? `+${toPar}` : `${toPar}`;
 
+  // Net + Stableford over the holes filled so far (needs SI + a playing handicap)
+  const netStats = useMemo(() => {
+    if (!hasSI || hcpNum == null) return null;
+    let net = 0, pts = 0;
+    for (const h of scorecard) {
+      const score = parseInt(holes[h.hole], 10);
+      if (!(score > 0)) continue;
+      const rec = strokesFor(h.stroke_index);
+      net += score - rec;
+      pts += Math.max(0, 2 - (score - rec - h.par));
+    }
+    return { net, pts };
+  }, [holes, scorecard, hasSI, hcpNum]); // eslint-disable-line react-hooks/exhaustive-deps
+
   async function saveRound() {
     if (!user) return;
     const usingHoles = hasCard && holesFilled === scorecard.length;
@@ -112,6 +143,8 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
       tee_name: tee ? tee.tee : null,
       course_rating: tee ? tee.course_rating : null,
       slope: tee ? tee.slope : null,
+      playing_handicap: hcpNum,
+      points: usingHoles && netStats ? netStats.pts : null,
     });
     setBusy(false);
     if (error) {
@@ -201,13 +234,38 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                 </label>
               )}
 
+              {hasSI && (
+                <label className="notice" style={{ display: 'block', marginBottom: 8 }}>
+                  Playing handicap{' '}
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min="-10"
+                    max="54"
+                    value={hcp}
+                    placeholder="e.g. 14"
+                    onChange={(e) => setHcp(e.target.value)}
+                    style={{ marginLeft: 6, width: 80, padding: '9px 10px', border: '1px solid var(--cream-dark)', borderRadius: 8, fontSize: 16 }}
+                  />
+                  <span style={{ display: 'block', marginTop: 4, fontSize: 12 }}>
+                    Optional — adds your net score and Stableford points as you go, using each
+                    hole&apos;s stroke index.
+                  </span>
+                </label>
+              )}
+
               {hasCard ? (
                 <>
                   <div className="holes-grid">
                     {scorecard.map((h) => (
                       <label key={h.hole} className="hole-cell">
                         <span className="hole-num">{h.hole}</span>
-                        <span className="hole-par">Par {h.par}</span>
+                        <span className="hole-par">
+                          Par {h.par}{h.stroke_index ? ` · S${h.stroke_index}` : ''}
+                          {hcpNum != null && h.stroke_index && strokesFor(h.stroke_index) > 0 ? (
+                            <span className="hole-dots">{'•'.repeat(Math.min(3, strokesFor(h.stroke_index)))}</span>
+                          ) : null}
+                        </span>
                         <input
                           type="number"
                           inputMode="numeric"
@@ -233,6 +291,12 @@ export default function Scorecard({ course, scorecard = [], autoOpen = false, re
                       )}
                     </span>
                   </div>
+                  {netStats && holesFilled > 0 && (
+                    <div className="run-net">
+                      <span>Net <strong>{netStats.net}</strong></span>
+                      <span>Stableford <strong>{netStats.pts} pts</strong></span>
+                    </div>
+                  )}
                   {holesFilled < scorecard.length && (
                     <p className="notice" style={{ margin: '4px 0 0' }}>
                       Fill every hole for a full card, or just enter your total below.

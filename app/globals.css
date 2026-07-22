@@ -820,3 +820,25 @@ footer {
 @media (max-width: 480px) {
   .grp-row { grid-template-columns: 22px 1fr auto 56px 48px; }
 }
+
+/* Net + Stableford running line under the total bar */
+.run-net {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  background: var(--green-mid);
+  color: var(--cream);
+  border-radius: 0 0 10px 10px;
+  margin-top: -6px;
+  padding: 8px 14px 7px;
+  font-size: 13.5px;
+}
+.run-net strong { color: var(--gold); font-size: 15px; }
+
+/* Stroke-received dots on hole cells */
+.hole-dots {
+  color: var(--gold);
+  margin-left: 3px;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
