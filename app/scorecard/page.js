@@ -30,6 +30,12 @@ export default async function ScorecardHub() {
         </div>
       </section>
       <div className="container" style={{ paddingTop: 16 }}>
+        <Link href="/group" className="number-banner" style={{ display: 'block', textDecoration: 'none' }}>
+          <span className="nb-text">
+            <strong>👥 Playing in a fourball?</strong> Start a group round — one scorer captures
+            everyone, live leaderboard for the lot. <span style={{ color: 'var(--gold)', fontWeight: 700 }}>Start →</span>
+          </span>
+        </Link>
         <MyScores />
         <ScoringStats />
         <ScorecardPicker courses={courses} />
