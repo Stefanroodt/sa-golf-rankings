@@ -758,3 +758,9 @@ footer {
 @media (max-width: 560px) {
   .nb-cta { flex-direction: column; align-items: flex-start; }
 }
+
+/* Modals always use dark text, even when opened inside dark sections (hero etc.) */
+.modal, .modal p { color: var(--ink); }
+.modal h2 { color: var(--green-deep); }
+.modal .notice { color: #6b675c; }
+.modal strong { color: var(--green-deep); }
