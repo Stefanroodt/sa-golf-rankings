@@ -218,13 +218,13 @@ export default function GroupRound({ params }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
           <h2 style={{ color: 'var(--cream)', marginBottom: 0 }}>🏆 Leaderboard</h2>
           <span className="grp-toggle">
-            {['gross', 'net', 'points'].map((m) => (
+            {['gross', 'net'].map((m) => (
               <button
                 key={m}
                 className={view === m ? 'active' : ''}
                 onClick={() => setView(m)}
               >
-                {m === 'gross' ? 'Gross' : m === 'net' ? 'Net' : 'Points'}
+                {m === 'gross' ? 'Gross' : 'Net & Points'}
               </button>
             ))}
           </span>
@@ -234,13 +234,13 @@ export default function GroupRound({ params }) {
           <span>Player</span>
           <span style={{ textAlign: 'right' }}>Thru</span>
           <span style={{ textAlign: 'right' }}>
-            {view === 'points' ? 'Points' : view === 'net' ? 'Net score' : 'Gross score'}
+            {view === 'net' ? 'Net score' : 'Gross score'}
           </span>
-          <span style={{ textAlign: 'right' }}>{view === 'points' ? '' : 'To par'}</span>
+          <span style={{ textAlign: 'right' }}>{view === 'net' ? 'Points' : 'To par'}</span>
         </div>
         {board.map((p, i) => {
-          const noNet = view !== 'gross' && p.net == null;
-          const val = view === 'points' ? p.pts : view === 'net' ? p.net : p.total;
+          const noNet = view === 'net' && p.net == null;
+          const val = view === 'net' ? p.net : p.total;
           const tp = view === 'net' ? p.netToPar : p.toPar;
           return (
             <div key={p.id} className="grp-row" style={noNet ? { opacity: 0.45 } : undefined}>
@@ -253,9 +253,15 @@ export default function GroupRound({ params }) {
               <span className="grp-gross">
                 {p.thru === 0 ? '' : noNet ? '—' : val}
               </span>
-              <span className={`grp-topar ${tp > 0 ? 'over' : tp < 0 ? 'under' : ''}`}>
-                {view === 'points' || noNet ? '' : fmtPar(tp, p.thru)}
-              </span>
+              {view === 'net' ? (
+                <span className="grp-topar under">
+                  {noNet || p.thru === 0 ? '' : `${p.pts} pts`}
+                </span>
+              ) : (
+                <span className={`grp-topar ${tp > 0 ? 'over' : tp < 0 ? 'under' : ''}`}>
+                  {fmtPar(tp, p.thru)}
+                </span>
+              )}
             </div>
           );
         })}
