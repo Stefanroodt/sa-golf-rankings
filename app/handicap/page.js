@@ -112,11 +112,6 @@ export default function HandicapPage() {
         Preview · visible only to you
       </div>
       <h1 style={{ fontSize: 26, marginBottom: 4 }}>🏌️ Your Pin High Number</h1>
-      <p className="notice" style={{ marginTop: 0 }}>
-        An unofficial handicap-style number from your logged rounds, using each course&apos;s rating and
-        slope for the tee you played — (score − rating) × 113 ÷ slope. Not a GolfRSA handicap, but the
-        same maths behind one. It moves as you play.
-      </p>
 
       <div className="card" style={{ textAlign: 'center', marginTop: 16, background: 'var(--green-deep)', color: 'var(--cream)' }}>
         <div style={{ fontSize: 13, color: '#cfe0d5', letterSpacing: '.1em', textTransform: 'uppercase' }}>Pin High Number</div>
