@@ -22,6 +22,7 @@ export default function MyScores() {
           .select('id, course_id, played_at, total_score, courses(name, slug)')
           .eq('user_id', u.user.id)
           .order('played_at', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(100),
         supabase.from('ratings').select('course_id').eq('user_id', u.user.id),
       ]);

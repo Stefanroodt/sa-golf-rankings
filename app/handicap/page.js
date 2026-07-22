@@ -36,6 +36,7 @@ export default function HandicapPage() {
         .select('id, course_id, played_at, total_score, tee_name, course_rating, slope, courses(name, slug)')
         .eq('user_id', u.user.id)
         .order('played_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
       setRounds(rds || []);
       const ids = [...new Set((rds || []).map((r) => r.course_id))];
