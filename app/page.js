@@ -3,6 +3,7 @@ import RankingsExplorer from '../components/RankingsExplorer';
 import PlayedProgress from '../components/PlayedProgress';
 import PrizeBanner from '../components/PrizeBanner';
 import InstallApp from '../components/InstallApp';
+import Onboarding from '../components/Onboarding';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
 export const revalidate = 60;
@@ -14,6 +15,7 @@ export default async function Home() {
 
   return (
     <>
+      <Onboarding />
       <section className="hero">
         <div className="container">
           <h1>Golf courses, ranked by golfers.</h1>

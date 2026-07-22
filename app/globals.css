@@ -663,3 +663,62 @@ footer {
   color: var(--cream);
 }
 .footer-links .nav-feedback:hover { color: var(--gold); }
+
+/* ---- First-visit tooltip tour ---- */
+.onb { position: fixed; inset: 0; z-index: 400; pointer-events: none; }
+.onb-dim {
+  position: fixed; inset: 0;
+  background: rgba(6, 20, 14, 0.6);
+  pointer-events: auto;
+}
+.onb-ring {
+  position: fixed;
+  border: 3px solid var(--gold);
+  border-radius: 26px;
+  box-shadow: 0 0 0 9999px rgba(6, 20, 14, 0.6);
+  transition: all 0.25s ease;
+  pointer-events: auto;
+}
+.onb-card {
+  position: fixed;
+  width: min(360px, calc(100vw - 28px));
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 16px;
+  padding: 18px 18px 14px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+.onb-card h3 { font-size: 18px; margin: 0 26px 6px 0; color: var(--green-deep); }
+.onb-card p { font-size: 14px; line-height: 1.5; margin: 0 0 14px; color: #4a463c; }
+.onb-close {
+  position: absolute; top: 8px; right: 12px;
+  background: none; border: none; font-size: 24px; line-height: 1;
+  color: var(--muted); cursor: pointer; padding: 4px;
+}
+.onb-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.onb-next {
+  background: var(--gold); color: var(--green-deep);
+  border: none; border-radius: 20px; padding: 9px 18px;
+  font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit;
+}
+.onb-next:hover { background: #d9b23a; }
+.onb-back {
+  background: none; border: 1px solid var(--cream-dark); border-radius: 20px;
+  padding: 9px 16px; font-size: 14px; cursor: pointer; font-family: inherit;
+  color: var(--ink);
+}
+.onb-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 12px;
+}
+.onb-dots { display: flex; gap: 5px; }
+.onb-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cream-dark); display: inline-block;
+}
+.onb-dot.active { background: var(--gold); }
+.onb-skip {
+  background: none; border: none; font-size: 12px; color: var(--muted);
+  text-decoration: underline; cursor: pointer; font-family: inherit; padding: 0;
+}
