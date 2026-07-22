@@ -722,3 +722,39 @@ footer {
   background: none; border: none; font-size: 12px; color: var(--muted);
   text-decoration: underline; cursor: pointer; font-family: inherit; padding: 0;
 }
+
+/* ---- Pin High Number interest banner ---- */
+.number-banner {
+  background: var(--green-deep);
+  border: 1px solid var(--green-mid);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+.nb-cta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; width: 100%; background: none; border: none;
+  cursor: pointer; text-align: left; font-family: inherit; padding: 0;
+}
+.nb-text { color: var(--cream); font-size: 14px; line-height: 1.45; }
+.nb-text strong { color: var(--gold); }
+.nb-btn {
+  background: var(--gold); color: var(--green-deep);
+  border: none; border-radius: 20px; padding: 9px 16px;
+  font-weight: 700; font-size: 14px; white-space: nowrap;
+  cursor: pointer; font-family: inherit; flex-shrink: 0;
+}
+.nb-btn:hover { background: #d9b23a; }
+.nb-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.nb-form input {
+  flex: 1; min-width: 200px; padding: 10px 12px;
+  border: 1px solid var(--green-mid); border-radius: 8px;
+  font-size: 16px; background: #fff; color: var(--ink); font-family: inherit;
+}
+.nb-done { color: var(--cream); font-size: 14px; margin: 0; }
+.nb-err { color: #e8b4a5; font-size: 13px; width: 100%; }
+
+@media (max-width: 560px) {
+  .nb-cta { flex-direction: column; align-items: flex-start; }
+}

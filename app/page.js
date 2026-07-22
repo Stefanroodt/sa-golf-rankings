@@ -4,6 +4,7 @@ import PlayedProgress from '../components/PlayedProgress';
 import PrizeBanner from '../components/PrizeBanner';
 import InstallApp from '../components/InstallApp';
 import Onboarding from '../components/Onboarding';
+import NumberBanner from '../components/NumberBanner';
 import { getRankings, getRecentRatings, getTopReviewers, PROVINCES, provinceSlug } from '../lib/server';
 
 export const revalidate = 60;
@@ -35,6 +36,7 @@ export default async function Home() {
       </section>
 
       <div className="container">
+        <NumberBanner />
         <PrizeBanner />
         <PlayedProgress />
         <div className="province-links">
